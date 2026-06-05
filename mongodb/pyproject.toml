@@ -1,0 +1,20 @@
+[project]
+name = "mongodb"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "beanie>=2.1.0",
+    "dependency-injector>=4.49.0",
+    "pydantic-settings>=2.14.1",
+    "python-json-logger>=4.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "factory-boy>=3.3.3",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "pytest-mock>=3.15.1",
+]

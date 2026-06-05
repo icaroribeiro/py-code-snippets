@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "./mongodb",
+			"name": "mongodb"
+		},
+		{
+			"path": "./postgresql",
+			"name": "postgresql"
+		},
+		{
+			"path": "./web-server",
+			"name": "web-server"
+		},
+		{
+			"path": ".",
+			"name": "ROOT"
+		}
+	],
+	"settings": {}
+}

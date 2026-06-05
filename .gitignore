@@ -1,0 +1,35 @@
+# ==========================================
+# Python & Bytecode (Aplica em todas as pastas)
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ==========================================
+# Linters, Formatters & Package Managers
+# ==========================================
+.venv/
+.uv/
+.ruff_cache/
+
+# ==========================================
+# Testing & Coverage Reports
+# ==========================================
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ==========================================
+# Environment Variables & Secrets (CRITICAL)
+# ==========================================
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# IDEs & System Files
+# ==========================================
+.vscode/
+.idea/
+.DS_Store

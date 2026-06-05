@@ -1,0 +1,17 @@
+services:
+  mongodb:
+      container_name: py-cd-sn-mongodb-database
+      image: mongo:latest
+      restart: always
+      ports:
+        - "27017:27017"
+      env_file:
+        - .env
+      environment:
+        - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
+        - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      volumes:
+        - mongodb_data:/var/lib/mongodb
+
+volumes:
+  mongodb_data:

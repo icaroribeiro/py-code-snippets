@@ -1,9 +1,9 @@
 from typing import Optional
 
-from adapters.outbound.persistence.mongodb.documents.task_document import (
+from adapters.outbound.persistence.documents.task_document import (
     TaskDocument,
 )
-from adapters.outbound.persistence.mongodb.mappers.task_mapper import (
+from adapters.outbound.persistence.mappers.task_mapper import (
     TaskMapper,
 )
 from core.domain.task import Task

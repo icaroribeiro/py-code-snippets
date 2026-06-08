@@ -1,4 +1,4 @@
-from adapters.outbound.persistence.mongodb.documents.task_document import (
+from adapters.outbound.persistence.documents.task_document import (
     TaskDocument,
 )
 from core.domain.task import Task, TaskStatus

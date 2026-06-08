@@ -2,8 +2,8 @@ from dependency_injector import containers, providers
 from pymongo import AsyncMongoClient
 
 from adapters.outbound.health.service import Service
-from adapters.outbound.messaging.redis.publishers.event_publisher import EventPublisher
-from adapters.outbound.persistence.mongodb.repositories.task_repository import (
+from adapters.outbound.messaging.event_publisher import EventPublisher
+from adapters.outbound.persistence.repositories.task_repository import (
     TaskRepository,
 )
 from adapters.outbound.task_queue.task_manager import TaskManager

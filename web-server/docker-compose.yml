@@ -1,12 +1,26 @@
 services:
+  mongodb:
+    container_name: py-cd-sn-web-server-mongodb
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+    volumes:
+      - mongodb_data:/var/lib/mongodb
+
   redis:
-      container_name: py-cd-sn-web-server-redis
-      image: redis:latest
-      restart: always
-      ports:
-        - "6379:6379"
-      volumes:
-        - redis_data:/var/lib/redis
+    container_name: py-cd-sn-web-server-redis
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/var/lib/redis
 
   rabbitmq:
     container_name: py-cd-sn-web-server-rabbitmq
@@ -20,21 +34,7 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
-  mongodb:
-      container_name: py-cd-sn-web-server-mongodb
-      image: mongo:latest
-      restart: always
-      ports:
-        - "27017:27017"
-      env_file:
-        - .env
-      environment:
-        - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
-        - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
-      volumes:
-        - mongodb_data:/var/lib/mongodb
-
 volumes:
+  mongodb_data:
   redis_data:
   rabbitmq_data:
-  mongodb_data:

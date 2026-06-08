@@ -3,44 +3,28 @@ from typing import Annotated
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 
-from core.usecase.check_health_usecase import CheckHealthUseCase
-from src.infrastructure.celery.message_broker import CeleryMessageBroker
-from src.infrastructure.container import Container
-from src.infrastructure.mongodb.database import MongoDBDatabase
-from src.infrastructure.redis.database import RedisDatabase
+from core.use_cases.health_use_case import HealthUseCase
+from core.use_cases.task_use_case import TaskUseCase
+from infrastructure.container import Container
 
 
 class Dependencies:
     @staticmethod
     @inject
-    def redis_database(
-        instance: Annotated[RedisDatabase, Depends(Provide[Container.redis])],
-    ) -> RedisDatabase:
-        return instance
+    async def health_use_case(
+        health_use_case: Annotated[
+            HealthUseCase,
+            Depends(Provide[Container.health_use_case]),
+        ],
+    ) -> HealthUseCase:
+        return health_use_case
 
     @staticmethod
     @inject
-    def celery_message_broker(
-        celery_message_broker: Annotated[
-            CeleryMessageBroker, Depends(Provide[Container.celery_message_broker])
+    async def task_use_case(
+        task_use_case: Annotated[
+            TaskUseCase,
+            Depends(Provide[Container.task_use_case]),
         ],
-    ) -> CeleryMessageBroker:
-        return celery_message_broker
-
-    @staticmethod
-    @inject
-    def mongodb_database(
-        mongodb_database: Annotated[
-            MongoDBDatabase, Depends(Provide[Container.mongodb_database])
-        ],
-    ) -> MongoDBDatabase:
-        return mongodb_database
-
-    @staticmethod
-    @inject
-    def check_health_usecase(
-        check_health_usecase: Annotated[
-            CheckHealthUseCase, Depends(Provide[Container.check_health_usecase])
-        ],
-    ) -> CheckHealthUseCase:
-        return check_health_usecase
+    ) -> TaskUseCase:
+        return task_use_case

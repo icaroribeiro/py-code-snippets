@@ -2,8 +2,11 @@ from beanie import init_beanie
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.database import AsyncDatabase
 
-from core.logging.logger_factory import get_logger
-from src.infrastructure.mongodb.migration_manager import MigrationManager
+from adapters.outbound.persistence.mongodb.documents.task_document import (
+    TaskDocument,
+)
+from infrastructure.logging import get_logger
+from infrastructure.mongodb.migration_manager import MigrationManager
 
 logger = get_logger(__name__)
 
@@ -29,7 +32,7 @@ class MongoDBDatabase:
         self.db = self._client[self._database_name]
         await self._migration_manager.run_migrations()
         logger.info(f"Initializing Beanie ODM with database: {self._database_name}")
-        await init_beanie(database=self.db, document_models=[])
+        await init_beanie(database=self.db, document_models=[TaskDocument])
         if self.db is None:
             raise RuntimeError("Failed to initialize MongoDB connection")
         return self.db

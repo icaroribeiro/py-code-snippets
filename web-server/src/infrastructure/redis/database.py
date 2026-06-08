@@ -1,6 +1,6 @@
 import redis.asyncio as aioredis
 
-from src.core.logging.logger_factory import get_logger
+from infrastructure.logging import get_logger
 
 logger = get_logger(__name__)
 

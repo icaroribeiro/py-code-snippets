@@ -17,7 +17,13 @@ shutdown-infra:
 	@docker-compose down -v
 
 run-dev:
-	@uv run src/main.py
+	@PYTHONPATH=src uv run uvicorn src.main:app \
+		--reload \
+		--reload-dir src
+
+run:
+	@PYTHONPATH=src uv run uvicorn src.main:app \
+		--workers 4
 
 test-dev:
 	@uv run pytest
@@ -30,3 +36,7 @@ test: build
 
 run: build
 	@docker run -it --rm py-cd-sn:latest
+
+remove-pycache:
+	@export PYTHONDONTWRITEBYTECODE=1
+	@find . -type d -name "__pycache__" -exec rm -rf {} +

@@ -1,8 +1,8 @@
-from datetime import datetime, timezone
 from typing import Dict
+
 from pydantic import BaseModel, Field
 
-from src.core.domain.health import Health, HealthStatus
+from core.domain.health import Health
 
 
 class HealthResponseSchema(BaseModel):
@@ -13,23 +13,13 @@ class HealthResponseSchema(BaseModel):
 
 class HealthMapper:
     @staticmethod
-    def services_to_domain(services: Dict[str, str]) -> Health:
-        global_status = (
-            HealthStatus.HEALTHY
-            if all(s == HealthStatus.HEALTHY for s in services.values())
-            else HealthStatus.UNHEALTHY
-        )
-        
-        return Health(
-            status=global_status,
-            services=services,
-            verified_at=datetime.now(timezone.utc)
-        )
-
-    @staticmethod
-    def domain_to_response(health_domain: Health) -> HealthResponseSchema:
+    def domain_to_response(domain: Health) -> HealthResponseSchema:
+        """
+        Maps the pure domain entity to the HTTP Inbound Response Schema.
+        Used strictly at the API controller border.
+        """
         return HealthResponseSchema(
-            status=health_domain.status,
-            services=health_domain.services,
-            verified_at=health_domain.verified_at.isoformat().replace("+00:00", "") + "Z",
+            status=domain.status,
+            services=domain.services,
+            verified_at=domain.verified_at.isoformat().replace("+00:00", "") + "Z",
         )

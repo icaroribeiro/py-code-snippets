@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.core.domain.health import Health
+from core.domain.health import Health
 
 
 class HealthInputPort(ABC):

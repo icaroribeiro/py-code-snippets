@@ -4,7 +4,7 @@ from beanie.migrations.database import DBHandler
 from beanie.migrations.models import RunningDirections, RunningMode
 from beanie.migrations.runner import MigrationNode
 
-from core.logging.logger_factory import get_logger
+from infrastructure.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -23,19 +23,16 @@ class MigrationManager:
     async def run_migrations(self) -> None:
         logger.info(f"Starting MongoDB migrations from: {self._path_to_migrations}")
 
-        # 1. Sets up and opens the isolated connection for the migration runner
         DBHandler.set_db(uri=self._database_uri, db_name=self._database_name)
 
         try:
-            # Beanie accepts a Path object seamlessly here
             root_node = await MigrationNode.build(path=self._path_to_migrations)
 
             mode = RunningMode(direction=RunningDirections.FORWARD, distance=0)
 
-            # 2. Run the migrations (Up / Seeds)
             await root_node.run(
                 mode=mode, allow_index_dropping=False, use_transaction=False
             )
-        except Exception:
-            logger.info(f"Error during migrations: {e}")
+        except Exception as error:
+            logger.info(f"Error during migrations: {error}")
             raise

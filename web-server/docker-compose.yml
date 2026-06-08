@@ -1,6 +1,6 @@
 services:
   redis:
-      container_name: py-cd-sn-web-server-cache
+      container_name: py-cd-sn-web-server-redis
       image: redis:latest
       restart: always
       ports:
@@ -9,7 +9,7 @@ services:
         - redis_data:/var/lib/redis
 
   rabbitmq:
-    container_name: py-cd-sn-web-server-broker
+    container_name: py-cd-sn-web-server-rabbitmq
     image: rabbitmq:latest
     restart: always
     ports:
@@ -21,7 +21,7 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
 
   mongodb:
-      container_name: py-cd-sn-web-server-database
+      container_name: py-cd-sn-web-server-mongodb
       image: mongo:latest
       restart: always
       ports:

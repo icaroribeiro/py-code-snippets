@@ -1,55 +1,55 @@
 import asyncio
 import sys
 
-from core.logging.logger_factory import get_logger
-from src.infrastructure.container import Container
+import uvicorn
+
+from infrastructure.config import get_http_server_settings
+from infrastructure.http_server import HTTPServer
+from infrastructure.logging import LoggerFactory, get_logger
 
 logger = get_logger(__name__)
 
 
+http_server_settings = get_http_server_settings()
+
+logger.info(
+    f"Starting {http_server_settings.env.upper()} server on http://{http_server_settings.host}:{http_server_settings.port}"
+)
+
+http_server_builder = HTTPServer(
+    settings=http_server_settings, title="Default Web Server", version="1.0.0"
+)
+
+app = http_server_builder.build()
+
+
 async def start_server():
-    logger.info("Starting application...")
+    LoggerFactory.init()
 
-    container = Container()
-
-    init_resources_result = container.init_resources()
-    if asyncio.iscoroutine(init_resources_result):
-        await init_resources_result
-
-    logger.info(
-        "Database and migrations initialized inside the dependency container successfully."
-    )
-
-    i18n_usecase = await container.get_i18n_text_usecase.async_()
-
+    logger.info("Starting application bootstrap...")
     try:
-        logger.info("--- STARTING LOCALIZATION FLOW TRIALS ---")
-        # Scenario A: Must fetch directly from MongoDB (Migration seed)
-        txt_pt = await i18n_usecase.execute(lang="pt-BR", key="welcome_msg")
-        logger.info(f"[PROMPT: pt-BR] Result from MongoDB: '{txt_pt}'")
+        config = uvicorn.Config(
+            app=app,
+            host=http_server_settings.host,
+            port=http_server_settings.port,
+            log_level="info",
+            reload=False,
+        )
 
-        # Scenario B: Must fail in MongoDB and load from 'es-MX.json' file
-        txt_es = await i18n_usecase.execute(lang="es-MX", key="welcome_msg")
-        logger.info(f"[PROMPT: es-MX] Result from JSON File: '{txt_es}'")
-
-        # Scenario C: Non-existent language (e.g., French), should activate the fallback chain to the global default 'en-US'
-        txt_fr = await i18n_usecase.execute(lang="fr-FR", key="welcome_msg")
-        logger.info(f"[PROMPT: fr-FR] Result from Global Fallback (en-US): '{txt_fr}'")
-
-        # Scenario D: Ghost key that doesn't exist anywhere (Emergency Mode)
-        txt_ghost = await i18n_usecase.execute(lang="pt-BR", key="non_existent_key")
-        logger.info(f"[PROMPT: Ghost Key] Emergency Recovery Result: '{txt_ghost}'")
-
-        logger.info("--- END OF LOCALIZATION FLOW TRIALS ---")
+        server = uvicorn.Server(config)
+        await server.serve()
+    except KeyboardInterrupt, asyncio.CancelledError:
+        logger.info("Server loop execution intercepted and cancelled successfully.")
     except Exception as error:
         logger.error(f"Critical error during application bootstrap: {error}")
-    finally:
-        logger.info("Shutting down application and cleaning up resources...")
-        shutdown_result = container.shutdown_resources()
-        if asyncio.iscoroutine(shutdown_result):
-            await shutdown_result
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    asyncio.run(start_server())
-    sys.exit(0)
+    try:
+        asyncio.run(start_server())
+    except KeyboardInterrupt, asyncio.CancelledError:
+        pass
+    finally:
+        logger.info("Process terminated cleanly. Goodbye.")
+        sys.exit(0)

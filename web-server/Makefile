@@ -17,13 +17,13 @@ shutdown-infra:
 	@docker-compose down -v
 
 run-dev:
-	@PYTHONPATH=src uv run uvicorn src.main:app \
-		--reload \
-		--reload-dir src
+	@PYTHONPATH=src uv run uvicorn src.main:app --reload --reload-dir src
 
 run:
-	@PYTHONPATH=src uv run uvicorn src.main:app \
-		--workers 4
+	@PYTHONPATH=src uv run uvicorn src.main:app --workers 4
+
+run-worker:
+	@PYTHONPATH=src uv run celery -A src.infrastructure.celery.main worker --loglevel=info -P solo --without-mingle --without-gossip
 
 test-dev:
 	@uv run pytest
@@ -34,7 +34,7 @@ build:
 test: build
 	@docker run --rm py-cd-sn:latest uv run pytest
 
-run: build
+run-prod: build
 	@docker run -it --rm py-cd-sn:latest
 
 remove-pycache:

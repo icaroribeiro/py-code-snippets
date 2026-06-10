@@ -4,7 +4,7 @@ from typing import Any
 import redis.asyncio as aioredis
 
 from core.ports.outbound.messaging.event_publisher_port import EventPublisherPort
-from infrastructure.logging import get_logger
+from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)
 

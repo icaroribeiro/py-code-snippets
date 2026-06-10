@@ -3,7 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from core.domain.errors import CoreError, CoreErrorCategory
-from infrastructure.logging import get_logger
+from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)
 

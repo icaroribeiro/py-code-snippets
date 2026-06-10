@@ -22,7 +22,6 @@ class TaskMapper:
     @staticmethod
     def to_document(domain: Task) -> TaskDocument:
         document_data = {
-            "_id": domain.id,
             "status": domain.status.value,
             "user_id": domain.user_id,
             "payload": domain.payload,

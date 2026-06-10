@@ -6,7 +6,7 @@ from adapters.outbound.messaging.event_publisher import EventPublisher
 from adapters.outbound.persistence.repositories.task_repository import (
     TaskRepository,
 )
-from adapters.outbound.task_queue.task_manager import TaskManager
+from adapters.outbound.task_queue.task_orchestrator import TaskOrchestrator
 from core.use_cases.health_use_case import HealthUseCase
 from core.use_cases.task_use_case import TaskUseCase
 from infrastructure.celery.broker import CeleryBroker
@@ -57,7 +57,7 @@ async def init_mongodb_database_resource(
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
-        packages=["src.infrastructure.celery.tasks"]
+        packages=["adapters.outbound.task_queue.tasks"]
     )
 
     redis_config = providers.Singleton(get_redis_settings)
@@ -106,16 +106,18 @@ class Container(containers.DeclarativeContainer):
 
     task_repository = providers.Factory(TaskRepository)
 
+    task_orchestrator = providers.Factory(
+        TaskOrchestrator,
+    )
+
     event_publisher = providers.Singleton(
         EventPublisher,
         redis_url=redis_config.provided.rate_limit_url,
     )
 
-    task_manager = providers.Factory(TaskManager)
-
     task_use_case = providers.Factory(
         TaskUseCase,
         repository=task_repository,
+        orchestrator=task_orchestrator,
         publisher=event_publisher,
-        manager=task_manager,
     )

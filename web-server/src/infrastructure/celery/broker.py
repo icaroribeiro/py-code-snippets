@@ -1,6 +1,6 @@
 from celery import Celery
 
-from infrastructure.logging import LoggerFactory, get_logger
+from infrastructure.cross_cutting.logging import Logging, get_logger
 
 logger = get_logger(__name__)
 
@@ -12,7 +12,7 @@ class CeleryBroker:
         self.app: Celery | None = None
 
     def init(self) -> Celery:
-        LoggerFactory.init()
+        Logging.init()
 
         logger.info("Bootstrapping Celery application lifecycle...")
 
@@ -30,6 +30,8 @@ class CeleryBroker:
             accept_content=["json"],
             enable_utc=True,
             worker_prefetch_multiplier=1,
+            # --- FORCES THE COMPLETE DEACTIVATION OF THE TEMPORARY QUEUE COMPONENT ---
+            worker_enable_remote_control=False,  # Disables Pidbox (Control)
         )
 
         # Auto-discovers asynchronous tasks downstream

@@ -15,7 +15,7 @@ class TaskDocument(Document):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     class Settings:
-        name = "_tasks"
+        name = "tasks"
         indexes = [
             "status",
             "created_at",

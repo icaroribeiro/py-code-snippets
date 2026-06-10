@@ -5,7 +5,7 @@ from functools import lru_cache
 from pythonjsonlogger.json import JsonFormatter
 
 
-class LoggerFactory:
+class Logging:
     @staticmethod
     def init(log_level: int = logging.INFO) -> None:
         """
@@ -42,4 +42,4 @@ def get_logger(module_name: str) -> logging.Logger:
     """
     Retrieves a cached, namespaced Logger instance for a specific module.
     """
-    return LoggerFactory.create_logger(module_name)
+    return Logging.create_logger(module_name)

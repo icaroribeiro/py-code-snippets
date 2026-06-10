@@ -4,7 +4,7 @@ from beanie.migrations.database import DBHandler
 from beanie.migrations.models import RunningDirections, RunningMode
 from beanie.migrations.runner import MigrationNode
 
-from infrastructure.logging import get_logger
+from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)
 

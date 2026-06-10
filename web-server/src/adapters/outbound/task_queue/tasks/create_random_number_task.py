@@ -5,15 +5,12 @@ from typing import Any
 from celery import shared_task
 from dependency_injector.wiring import Provide, inject
 
+from adapters.outbound.task_queue.task_lifecycle_scope import task_lifecycle_scope
 from core.use_cases.task_use_case import TaskUseCase
 from infrastructure.container import Container
 
 
-@shared_task(
-    name="tasks.create_random_number_task",
-    bind=True,
-    max_retries=3,
-)
+@shared_task(name="tasks.create_random_number", bind=True)
 @inject
 def trigger_create_random_number_task(
     self,
@@ -21,33 +18,17 @@ def trigger_create_random_number_task(
     payload_data: dict[str, Any],
     use_case: TaskUseCase = Provide[Container.task_use_case],
 ) -> dict:
-    """
-    Unified Celery Task. Orchestrates the lifecycle state transitions and
-    runs the core business logic inside a single execution context.
-    """
-
-    async def _execute_and_calculate() -> dict[str, Any]:
-        # 1. Executa o delay simulado
-        await asyncio.sleep(5)
-
-        # 2. Processa a lógica de negócio do limite numérico
+    with task_lifecycle_scope(task=self, task_id=task_id, use_case=use_case):
+        asyncio.run(asyncio.sleep(5))
         upper_limit = payload_data.get("number", 100)
-
-        return {
+        result_data = {
             "calculated_value": random.randint(1, upper_limit),
             "engine": "default_worker",
             "task_id": task_id,
         }
-
-    try:
-        # Repassa a corrotina local diretamente para o orquestrador do Caso de Uso
-        return asyncio.run(
-            use_case.execute_task_pipeline(
-                task_id=task_id,
-                task_name="create_random_number",
-                async_coro=_execute_and_calculate(),
+        asyncio.run(
+            use_case.update_task_lifecycle_status(
+                task_id=task_id, status="SUCCESS", result=result_data
             )
         )
-    except Exception as error:
-        # Garante que falhas de infraestrutura/transporte permitam o retry do Celery
-        raise self.retry(exc=error, countdown=10)
+        return result_data

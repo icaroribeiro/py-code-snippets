@@ -4,8 +4,8 @@ import sys
 import uvicorn
 
 from infrastructure.config import get_http_server_settings
+from infrastructure.cross_cutting.logging import Logging, get_logger
 from infrastructure.http_server import HTTPServer
-from infrastructure.logging import LoggerFactory, get_logger
 
 logger = get_logger(__name__)
 
@@ -24,7 +24,7 @@ app = http_server_builder.build()
 
 
 async def start_server():
-    LoggerFactory.init()
+    Logging.init()
 
     logger.info("Starting application bootstrap...")
     try:

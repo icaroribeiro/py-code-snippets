@@ -47,7 +47,7 @@ class MongoDBSettings(BaseSettings):
     host: str = Field(default="your_mongodb_host_here")
     port: int = Field(default=0)
     database: str = Field(default="your_mongodb_database_name_here")
-    migrations_path: Path = Field(default=Path("src/infrastructure/mongodb/migrations"))
+    migrations_path: Path = Field(default=Path("infrastructure/mongodb/migrations"))
     conn_string: str | None = Field(default=None)
 
     @field_validator("migrations_path", mode="after")
@@ -63,7 +63,7 @@ class MongoDBSettings(BaseSettings):
     @computed_field
     @property
     def uri(self) -> str:
-        if self.conn_string:
+        if self.conn_string and self.conn_string != "":
             return self.conn_string
         uri = f"mongodb://{self.username}:{self.password}@{self.host}:{self.port}"
         return uri

@@ -3,9 +3,6 @@ import asyncio
 import os
 import sys
 
-# Ensures the root directory is in the PYTHONPATH to safely import 'src' and 'core'
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 from beanie import init_beanie
 from beanie.migrations.database import DBHandler
 from beanie.migrations.models import RunningDirections, RunningMode
@@ -13,9 +10,9 @@ from beanie.migrations.runner import MigrationNode
 
 from adapters.outbound.persistence.documents.task_document import TaskDocument
 from infrastructure.config import MongoDBSettings
-from infrastructure.cross_cutting.logging import get_logger
+from infrastructure.cross_cutting.logging import Logging, get_logger
 
-logger = get_logger("migration_runner")
+logger = get_logger("")
 
 
 async def run_database_migrations():
@@ -25,7 +22,8 @@ async def run_database_migrations():
     """
     logger.info("Loading infrastructure configuration via Pydantic...")
 
-    root_env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.env"))
+    root_env_path = os.path.abspath(".env")
+
     mongodb_settings = MongoDBSettings(_env_file=root_env_path)  # type: ignore
 
     logger.info(
@@ -33,9 +31,7 @@ async def run_database_migrations():
     )
 
     try:
-        DBHandler.set_db(
-            uri=mongodb_settings.conn_string, db_name=mongodb_settings.database
-        )
+        DBHandler.set_db(uri=mongodb_settings.uri, db_name=mongodb_settings.database)
 
         db_client = DBHandler.get_db()
         await init_beanie(database=db_client, document_models=[TaskDocument])
@@ -54,4 +50,5 @@ async def run_database_migrations():
 
 
 if __name__ == "__main__":
+    Logging.init()
     asyncio.run(run_database_migrations())

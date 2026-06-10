@@ -7,8 +7,7 @@ add-migration:
 	@beanie new-migration -n $(MIGRATION_NAME) -p src/infrastructure/mongodb/migrations
 
 migrate:
-	@echo "Running database migrations..."
-	@uv run scripts/run_migrations.py
+	@PYTHONPATH=src uv run scripts/run_migrations.py
 
 init-infra:
 	@docker-compose up --build -d mongodb redis rabbitmq

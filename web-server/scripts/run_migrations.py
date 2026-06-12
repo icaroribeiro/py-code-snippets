@@ -8,7 +8,7 @@ from beanie.migrations.database import DBHandler
 from beanie.migrations.models import RunningDirections, RunningMode
 from beanie.migrations.runner import MigrationNode
 
-from adapters.outbound.persistence.documents.task_document import TaskDocument
+from adapters.outbound.task.persistence.documents import TaskDocument
 from infrastructure.config import MongoDBSettings
 from infrastructure.cross_cutting.logging import Logging, get_logger
 

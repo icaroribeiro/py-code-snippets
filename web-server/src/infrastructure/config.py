@@ -139,6 +139,17 @@ class RabbitMQSettings(BaseSettings):
         return f"amqp://{auth}{self.host}:{self.port}/{self.vhost}"
 
 
+class CelerySettings:
+    task_track_started = True
+    task_serializer = "json"
+    result_serializer = "json"
+    accept_content = ["json"]
+    enable_utc = True
+    worker_prefetch_multiplier = 1
+    # --- FORCES THE COMPLETE DEACTIVATION OF THE TEMPORARY QUEUE COMPONENT ---
+    worker_enable_remote_control = False
+
+
 @cache
 def get_http_server_settings() -> HTTPServerSettings:
     return HTTPServerSettings()

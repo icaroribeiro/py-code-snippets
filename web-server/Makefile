@@ -19,10 +19,10 @@ run-dev:
 	@PYTHONPATH=src uv run uvicorn src.main:app --reload --reload-dir src
 
 run:
-	@PYTHONPATH=src uv run uvicorn src.main:app --workers 4
+	@PYTHONPATH=src uv run uvicorn src.infrastructure.http_server.init:app --workers 4
 
 run-worker:
-	@PYTHONPATH=src uv run celery -A src.infrastructure.celery.main worker --loglevel=info -P solo --without-mingle --without-gossip
+	@PYTHONPATH=src uv run celery -A src.infrastructure.celery worker --loglevel=info -P solo --without-mingle --without-gossip
 
 test-dev:
 	@uv run pytest

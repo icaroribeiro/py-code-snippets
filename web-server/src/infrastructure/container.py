@@ -1,14 +1,14 @@
 from dependency_injector import containers, providers
 from pymongo import AsyncMongoClient
 
-from adapters.outbound.health.service import Service
-from adapters.outbound.messaging.event_publisher import EventPublisher
-from adapters.outbound.persistence.repositories.task_repository import (
+from adapters.outbound.health.checker import HealthChecker
+from adapters.outbound.task.persistence.repository import (
     TaskRepository,
 )
-from adapters.outbound.task_queue.task_orchestrator import TaskOrchestrator
-from core.use_cases.health_use_case import HealthUseCase
-from core.use_cases.task_use_case import TaskUseCase
+from adapters.outbound.task.task_queue.event_publisher import TaskEventPublisher
+from adapters.outbound.task.task_queue.orchestrator import TaskOrchestrator
+from core.use_cases.health.use_case import HealthUseCase
+from core.use_cases.task.use_case import TaskUseCase
 from infrastructure.celery.broker import CeleryBroker
 from infrastructure.config import (
     MongoDBSettings,
@@ -20,11 +20,11 @@ from infrastructure.config import (
 )
 from infrastructure.mongodb.database import MongoDBDatabase
 from infrastructure.mongodb.migration_manager import MigrationManager
-from infrastructure.redis.database import RedisDatabase
+from infrastructure.redis.storage import RedisStorage
 
 
-async def init_redis_database_resource(redis_config: RedisSettings):
-    redis_wrapper = RedisDatabase(url=redis_config.rate_limit_url)
+async def init_redis_storage_resource(redis_config: RedisSettings):
+    redis_wrapper = RedisStorage(url=redis_config.backend_url)
     await redis_wrapper.init()
     yield redis_wrapper
     await redis_wrapper.shutdown()
@@ -56,18 +56,14 @@ async def init_mongodb_database_resource(
 
 
 class Container(containers.DeclarativeContainer):
-    wiring_config = containers.WiringConfiguration(
-        packages=["adapters.outbound.task_queue.tasks"]
-    )
-
     redis_config = providers.Singleton(get_redis_settings)
 
     rabbitmq_config = providers.Singleton(get_rabbitmq_settings)
 
     mongodb_config = providers.Singleton(get_mongodb_settings)
 
-    redis_database = providers.Resource(
-        init_redis_database_resource,
+    redis_storage = providers.Resource(
+        init_redis_storage_resource,
         redis_config=redis_config,
     )
 
@@ -92,32 +88,32 @@ class Container(containers.DeclarativeContainer):
         migration_manager=migration_manager,
     )
 
-    health_service = providers.Factory(
-        Service,
+    health_checker = providers.Factory(
+        HealthChecker,
         mongodb_database=mongodb_database,
-        redis_database=redis_database,
+        redis_storage=redis_storage,
         celery_broker=celery_broker,
     )
 
     health_use_case = providers.Factory(
         HealthUseCase,
-        service=health_service,
+        health_checker=health_checker,
     )
-
-    task_repository = providers.Factory(TaskRepository)
 
     task_orchestrator = providers.Factory(
         TaskOrchestrator,
     )
 
-    event_publisher = providers.Singleton(
-        EventPublisher,
-        redis_url=redis_config.provided.rate_limit_url,
+    task_repository = providers.Factory(TaskRepository)
+
+    task_event_publisher = providers.Singleton(
+        TaskEventPublisher,
+        redis_storage=redis_storage,
     )
 
     task_use_case = providers.Factory(
         TaskUseCase,
-        repository=task_repository,
-        orchestrator=task_orchestrator,
-        publisher=event_publisher,
+        task_repository=task_repository,
+        task_orchestrator=task_orchestrator,
+        task_event_publisher=task_event_publisher,
     )

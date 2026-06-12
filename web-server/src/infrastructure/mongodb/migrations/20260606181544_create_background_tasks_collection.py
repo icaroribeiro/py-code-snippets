@@ -1,7 +1,7 @@
 from beanie import free_fall_migration
 from pymongo.asynchronous.client_session import AsyncClientSession
 
-from adapters.outbound.persistence.documents.task_document import (
+from adapters.outbound.task.persistence.documents import (
     TaskDocument,
 )
 from infrastructure.cross_cutting.logging import get_logger

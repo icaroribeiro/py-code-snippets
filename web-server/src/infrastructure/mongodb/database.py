@@ -2,7 +2,7 @@ from beanie import init_beanie
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.database import AsyncDatabase
 
-from adapters.outbound.persistence.documents.task_document import (
+from adapters.outbound.task.persistence.documents import (
     TaskDocument,
 )
 from infrastructure.cross_cutting.logging import get_logger

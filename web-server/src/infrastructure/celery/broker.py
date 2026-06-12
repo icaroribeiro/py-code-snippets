@@ -1,5 +1,6 @@
 from celery import Celery
 
+from infrastructure.config import CelerySettings
 from infrastructure.cross_cutting.logging import Logging, get_logger
 
 logger = get_logger(__name__)
@@ -23,16 +24,7 @@ class CeleryBroker:
         if self.app is None:
             raise RuntimeError("Failed to initialize Celery application")
 
-        self.app.conf.update(
-            task_track_started=True,
-            task_serializer="json",
-            result_serializer="json",
-            accept_content=["json"],
-            enable_utc=True,
-            worker_prefetch_multiplier=1,
-            # --- FORCES THE COMPLETE DEACTIVATION OF THE TEMPORARY QUEUE COMPONENT ---
-            worker_enable_remote_control=False,  # Disables Pidbox (Control)
-        )
+        self.app.config_from_object(CelerySettings)
 
         # Auto-discovers asynchronous tasks downstream
         self.app.autodiscover_tasks(

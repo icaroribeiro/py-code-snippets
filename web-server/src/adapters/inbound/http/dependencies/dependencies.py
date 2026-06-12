@@ -3,8 +3,8 @@ from typing import Annotated
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 
-from core.use_cases.health_use_case import HealthUseCase
-from core.use_cases.task_use_case import TaskUseCase
+from core.use_cases.health.use_case import HealthUseCase
+from core.use_cases.task.use_case import TaskUseCase
 from infrastructure.container import Container
 
 

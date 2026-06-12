@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-from typing import Awaitable, cast
 
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
@@ -28,24 +27,45 @@ class HTTPServer:
         self.container: Container | None = None
         self.app: FastAPI | None = None
 
-    @asynccontextmanager
-    async def _lifespan(self, app: FastAPI):
-        logger.info(
-            "Triggering declarative managed container resources initialization..."
-        )
+    def build(self) -> FastAPI:
         try:
-            if self.container is not None:
-                await cast(Awaitable[None], self.container.init_resources())
-            logger.info("Infrastructure successfully warmed up.")
-            yield
+            logger.info(
+                f"Assembling FastAPI application engine instance: '{self._title}'..."
+            )
+
+            self.container = Container()
+            self.container.wire(
+                modules=[
+                    "adapters.inbound.http.dependencies.dependencies",
+                ]
+            )
+
+            self.app = FastAPI(
+                title=self._title, version=self._version, lifespan=self._lifespan
+            )
+            self.app.extra["container"] = self.container
+            self.app.include_router(root_router)
+            self._setup_exception_handlers(self.app)
+
+            logger.info("FastAPI HTTP Server stack fully assembled and structured.")
+            return self.app
         except Exception as error:
             logger.critical(f"Server failed to start: {error}")
-            raise
-        finally:
-            logger.info("Executing graceful teardown of connection pools...")
             if self.container is not None:
-                await cast(Awaitable[None], self.container.shutdown_resources())
-            logger.info("Infrastructure resources closed cleanly.")
+                self.container.shutdown_resources()
+            raise
+
+    @asynccontextmanager
+    async def _lifespan(self, app: FastAPI):
+        logger.info("FastAPI lifecycle started successfully.")
+        if self.container is not None:
+            self.container.init_resources()
+        logger.info("Infrastructure resources initialized successfully.")
+        yield
+        logger.warning("Shutdown signal received. Cleaning up infrastructure...")
+        if self.container is not None:
+            self.container.shutdown_resources()
+        logger.info("Infrastructure resources closed cleanly.")
 
     def _setup_exception_handlers(self, app: FastAPI) -> None:
         app.add_exception_handler(CoreError, HTTPExceptionHandler.handle_core_error)
@@ -55,26 +75,3 @@ class HTTPServer:
         app.add_exception_handler(
             RequestValidationError, HTTPExceptionHandler.handle_validation_error
         )
-
-    def build(self) -> FastAPI:
-        logger.info(
-            f"Assembling FastAPI application engine instance: '{self._title}'..."
-        )
-
-        self.container = Container()
-        self.container.wire(
-            modules=[
-                "src.adapters.inbound.http.dependencies.dependencies",
-                "src.adapters.inbound.http.controllers.v1.health_controller",
-            ]
-        )
-
-        self.app = FastAPI(
-            title=self._title, version=self._version, lifespan=self._lifespan
-        )
-        self.app.extra["container"] = self.container
-        self.app.include_router(root_router)
-        self._setup_exception_handlers(self.app)
-
-        logger.info("FastAPI HTTP Server stack fully assembled and structured.")
-        return self.app

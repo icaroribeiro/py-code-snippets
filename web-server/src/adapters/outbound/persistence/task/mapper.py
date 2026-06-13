@@ -1,4 +1,4 @@
-from adapters.outbound.task.persistence.documents import (
+from adapters.outbound.persistence.task.documents import (
     TaskDocument,
 )
 from core.domain.task import Task, TaskStatus

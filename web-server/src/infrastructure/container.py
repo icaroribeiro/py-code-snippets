@@ -2,13 +2,14 @@ from dependency_injector import containers, providers
 from pymongo import AsyncMongoClient
 
 from adapters.outbound.health.checker import HealthChecker
-from adapters.outbound.task.persistence.repository import (
+from adapters.outbound.messaging.task.event_publisher import TaskEventPublisher
+from adapters.outbound.messaging.task.lifecycle_tracker import TaskLifecycleTracker
+from adapters.outbound.messaging.task.orchestrator import TaskOrchestrator
+from adapters.outbound.persistence.task.repository import (
     TaskRepository,
 )
-from adapters.outbound.task.task_queue.event_publisher import TaskEventPublisher
-from adapters.outbound.task.task_queue.orchestrator import TaskOrchestrator
-from core.use_cases.health.use_case import HealthUseCase
-from core.use_cases.task.use_case import TaskUseCase
+from core.use_cases.health_use_case import HealthUseCase
+from core.use_cases.task_use_case import TaskEmailUseCase, TaskRandomNumberUseCase
 from infrastructure.celery.broker import CeleryBroker
 from infrastructure.config import (
     MongoDBSettings,
@@ -100,10 +101,6 @@ class Container(containers.DeclarativeContainer):
         health_checker=health_checker,
     )
 
-    task_orchestrator = providers.Factory(
-        TaskOrchestrator,
-    )
-
     task_repository = providers.Factory(TaskRepository)
 
     task_event_publisher = providers.Singleton(
@@ -111,9 +108,23 @@ class Container(containers.DeclarativeContainer):
         redis_storage=redis_storage,
     )
 
-    task_use_case = providers.Factory(
-        TaskUseCase,
+    task_orchestrator = providers.Factory(
+        TaskOrchestrator,
         task_repository=task_repository,
-        task_orchestrator=task_orchestrator,
+    )
+
+    task_lifecycle_tracker = providers.Factory(
+        TaskLifecycleTracker,
+        task_repository=task_repository,
         task_event_publisher=task_event_publisher,
+    )
+
+    task_random_number_use_case = providers.Factory(
+        TaskRandomNumberUseCase,
+        task_orchestrator=task_orchestrator,
+    )
+
+    task_email_use_case = providers.Factory(
+        TaskEmailUseCase,
+        task_orchestrator=task_orchestrator,
     )

@@ -2,7 +2,7 @@ import asyncio
 from typing import Dict
 
 from core.domain.health import HealthStatus
-from core.ports.outbound.health.checker_output_port import HealthCheckerOutputPort
+from core.ports.outbound.health_port import HealthCheckerOutputPort
 from infrastructure.celery.broker import CeleryBroker
 from infrastructure.cross_cutting.logging import get_logger
 from infrastructure.mongodb.database import MongoDBDatabase

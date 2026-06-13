@@ -2,7 +2,7 @@ from beanie import init_beanie
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.database import AsyncDatabase
 
-from adapters.outbound.task.persistence.documents import (
+from adapters.outbound.persistence.task.documents import (
     TaskDocument,
 )
 from infrastructure.cross_cutting.logging import get_logger
@@ -30,11 +30,15 @@ class MongoDBDatabase:
 
     async def init(self) -> AsyncDatabase:
         self.db = self._client[self._database_name]
-        await self._migration_manager.run_migrations()
-        logger.info(f"Initializing Beanie ODM with database: {self._database_name}")
-        await init_beanie(database=self.db, document_models=[TaskDocument])
-        if self.db is None:
-            raise RuntimeError("Failed to initialize MongoDB connection")
+        try:
+            logger.info("Starting database migrations and Beanie ODM mapping...")
+            await self._migration_manager.run_migrations()
+            logger.info(f"Initializing Beanie ODM with database: {self._database_name}")
+            await init_beanie(database=self.db, document_models=[TaskDocument])
+        except Exception as error:
+            logger.error(
+                f"Remote cluster or local database instance is unreachable: {repr(error)}"
+            )
         return self.db
 
     async def shutdown(self):

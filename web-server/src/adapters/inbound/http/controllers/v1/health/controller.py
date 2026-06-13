@@ -8,7 +8,7 @@ from adapters.inbound.http.dependencies.dependencies import (
     Dependencies,
 )
 from core.domain.health import HealthStatus
-from core.use_cases.health.use_case import HealthUseCase
+from core.use_cases.health_use_case import HealthUseCase
 
 router = APIRouter()
 

@@ -1,7 +1,7 @@
 import json
 from typing import Any
 
-from core.ports.outbound.task.task_queue.event_publisher_output_port import (
+from core.ports.outbound.task_port import (
     TaskEventPublisherOutputPort,
 )
 from infrastructure.cross_cutting.logging import get_logger

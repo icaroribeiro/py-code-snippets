@@ -1,13 +1,13 @@
 from typing import Optional
 
-from adapters.outbound.task.persistence.documents import (
+from adapters.outbound.persistence.task.documents import (
     TaskDocument,
 )
-from adapters.outbound.task.persistence.mapper import (
+from adapters.outbound.persistence.task.mapper import (
     TaskMapper,
 )
 from core.domain.task import Task
-from core.ports.outbound.task.persistence.repository_output_port import (
+from core.ports.outbound.task_port import (
     TaskRepositoryOutputPort,
 )
 
@@ -20,15 +20,6 @@ class TaskRepository(TaskRepositoryOutputPort):
 
     async def find_by_id(self, task_id: str) -> Optional[Task]:
         document = await TaskDocument.get(task_id)
-        if not document:
-            return None
-        return TaskMapper.to_domain(document)
-
-    async def find_latest_by_user(self, user_id: str) -> Optional[Task]:
-        document = await TaskDocument.find_one(
-            {"user_id": user_id},
-            sort="-created_at",
-        )
         if not document:
             return None
         return TaskMapper.to_domain(document)

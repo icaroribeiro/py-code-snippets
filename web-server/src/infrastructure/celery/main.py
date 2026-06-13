@@ -22,7 +22,7 @@ async def bootstrap_worker() -> Container:
         container = Container()
         container.wire(
             modules=[
-                "src.adapters.outbound.task_queue.tasks.create_random_number_task",
+                "adapters.outbound.messaging.task.tasks.create_random_number_task",
             ]
         )
         container.init_resources()

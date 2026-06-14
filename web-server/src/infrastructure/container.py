@@ -1,14 +1,18 @@
 from dependency_injector import containers, providers
 from pymongo import AsyncMongoClient
 
-from adapters.outbound.health.checker import HealthChecker
-from adapters.outbound.messaging.task.event_publisher import TaskEventPublisher
-from adapters.outbound.messaging.task.lifecycle_tracker import TaskLifecycleTracker
-from adapters.outbound.messaging.task.orchestrator import TaskOrchestrator
-from adapters.outbound.persistence.task.repository import (
-    TaskRepository,
+from adapters.outbound.message_queue.celery.task_lifecycle_tracker import (
+    CeleryTaskLifecycleTracker,
 )
-from core.use_cases.health_use_case import HealthUseCase
+from adapters.outbound.message_queue.celery.task_orchestrator import (
+    CeleryTaskOrchestrator,
+)
+from adapters.outbound.persistence.mongodb.task.repository import (
+    MongoDBTaskRepository,
+)
+from adapters.outbound.pubsub.redis.task_publisher import RedisTaskPublisher
+from adapters.outbound.system.health.checker import HealthChecker
+from core.use_cases.health_use_case import HealthCheckUseCase
 from core.use_cases.task_use_case import TaskEmailUseCase, TaskRandomNumberUseCase
 from infrastructure.celery.broker import CeleryBroker
 from infrastructure.config import (
@@ -89,42 +93,42 @@ class Container(containers.DeclarativeContainer):
         migration_manager=migration_manager,
     )
 
-    health_checker = providers.Factory(
+    health_checker_adapter = providers.Factory(
         HealthChecker,
         mongodb_database=mongodb_database,
         redis_storage=redis_storage,
         celery_broker=celery_broker,
     )
 
-    health_use_case = providers.Factory(
-        HealthUseCase,
-        health_checker=health_checker,
-    )
+    task_repository_adapter = providers.Factory(MongoDBTaskRepository)
 
-    task_repository = providers.Factory(TaskRepository)
-
-    task_event_publisher = providers.Singleton(
-        TaskEventPublisher,
+    task_publisher_adapter = providers.Singleton(
+        RedisTaskPublisher,
         redis_storage=redis_storage,
     )
 
-    task_orchestrator = providers.Factory(
-        TaskOrchestrator,
-        task_repository=task_repository,
+    task_orchestrator_adapter = providers.Factory(
+        CeleryTaskOrchestrator,
+        task_repository=task_repository_adapter,
     )
 
-    task_lifecycle_tracker = providers.Factory(
-        TaskLifecycleTracker,
-        task_repository=task_repository,
-        task_event_publisher=task_event_publisher,
+    task_lifecycle_tracker_adapter = providers.Factory(
+        CeleryTaskLifecycleTracker,
+        task_repository=task_repository_adapter,
+        task_publisher=task_publisher_adapter,
+    )
+
+    health_check_use_case = providers.Factory(
+        HealthCheckUseCase,
+        health_checker=health_checker_adapter,
     )
 
     task_random_number_use_case = providers.Factory(
         TaskRandomNumberUseCase,
-        task_orchestrator=task_orchestrator,
+        task_orchestrator=task_orchestrator_adapter,
     )
 
     task_email_use_case = providers.Factory(
         TaskEmailUseCase,
-        task_orchestrator=task_orchestrator,
+        task_orchestrator=task_orchestrator_adapter,
     )

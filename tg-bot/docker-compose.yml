@@ -1,0 +1,40 @@
+services:
+  mongodb:
+    container_name: web-server-mongodb
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+    volumes:
+      - mongodb_data:/var/lib/mongodb
+
+  redis:
+    container_name: web-server-redis
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/var/lib/redis
+
+  rabbitmq:
+    container_name: web-server-rabbitmq
+    image: rabbitmq:latest
+    restart: always
+    ports:
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  mongodb_data:
+  redis_data:
+  rabbitmq_data:

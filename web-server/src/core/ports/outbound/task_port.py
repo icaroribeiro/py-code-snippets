@@ -14,7 +14,7 @@ class TaskRepositoryOutputPort(ABC):
         pass
 
 
-class TaskEventPublisherOutputPort(ABC):
+class TaskPublisherOutputPort(ABC):
     @abstractmethod
     async def publish(self, channel: str, message: dict[str, Any]) -> None:
         pass

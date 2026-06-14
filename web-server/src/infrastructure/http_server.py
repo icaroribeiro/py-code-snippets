@@ -17,7 +17,7 @@ class HTTPServer:
     def __init__(
         self,
         settings: HTTPServerSettings,
-        title: str = "Agile Ingestion Web Server",
+        title: str = "Asynchronous Tasks Web Server",
         version: str = "1.0.0",
     ) -> None:
         self._title = title

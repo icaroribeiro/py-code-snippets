@@ -13,6 +13,9 @@ class TaskResponseSchema(BaseModel):
 
 
 class TaskMapper:
+    def __init__(self) -> None:
+        pass
+
     @staticmethod
     def domain_to_response(domain: Task) -> TaskResponseSchema:
         """

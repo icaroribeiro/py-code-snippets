@@ -32,43 +32,6 @@ class HTTPServerSettings(BaseSettings):
         return self.env.lower() in {"production", "prod"}
 
 
-class MongoDBSettings(BaseSettings):
-    model_config = SettingsConfigDict(  # type: ignore
-        env_file=".env",
-        env_prefix="MONGODB_",
-        env_file_encoding="utf-8",
-        extra="ignore",
-        env_ignore_extra=True,
-        case_sensitive=False,
-    )
-
-    username: str = Field(default="your_mongodb_username_here")
-    password: str = Field(default="your_mongodb_password_here")
-    host: str = Field(default="your_mongodb_host_here")
-    port: int = Field(default=0)
-    database: str = Field(default="your_mongodb_database_name_here")
-    migrations_path: Path = Field(default=Path("infrastructure/mongodb/migrations"))
-    conn_string: str | None = Field(default=None)
-
-    @field_validator("migrations_path", mode="after")
-    @classmethod
-    def resolve_migrations_path(cls, v: Path) -> Path:
-        absolute_path = v.resolve()
-        if not absolute_path.exists():
-            logger.info(
-                f"[WARNING] MongoDB migrations directory not found at: {absolute_path}"
-            )
-        return absolute_path
-
-    @computed_field
-    @property
-    def uri(self) -> str:
-        if self.conn_string and self.conn_string != "":
-            return self.conn_string
-        uri = f"mongodb://{self.username}:{self.password}@{self.host}:{self.port}"
-        return uri
-
-
 class RedisSettings(BaseSettings):
     model_config = SettingsConfigDict(  # type: ignore
         env_file=".env",
@@ -150,14 +113,46 @@ class CelerySettings:
     worker_enable_remote_control = False
 
 
+class MongoDBSettings(BaseSettings):
+    model_config = SettingsConfigDict(  # type: ignore
+        env_file=".env",
+        env_prefix="MONGODB_",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        env_ignore_extra=True,
+        case_sensitive=False,
+    )
+
+    username: str = Field(default="your_mongodb_username_here")
+    password: str = Field(default="your_mongodb_password_here")
+    host: str = Field(default="your_mongodb_host_here")
+    port: int = Field(default=0)
+    database: str = Field(default="your_mongodb_database_name_here")
+    migrations_path: Path = Field(default=Path("infrastructure/mongodb/migrations"))
+    conn_string: str | None = Field(default=None)
+
+    @field_validator("migrations_path", mode="after")
+    @classmethod
+    def resolve_migrations_path(cls, v: Path) -> Path:
+        absolute_path = v.resolve()
+        if not absolute_path.exists():
+            logger.info(
+                f"[WARNING] MongoDB migrations directory not found at: {absolute_path}"
+            )
+        return absolute_path
+
+    @computed_field
+    @property
+    def uri(self) -> str:
+        if self.conn_string and self.conn_string != "":
+            return self.conn_string
+        uri = f"mongodb://{self.username}:{self.password}@{self.host}:{self.port}"
+        return uri
+
+
 @cache
 def get_http_server_settings() -> HTTPServerSettings:
     return HTTPServerSettings()
-
-
-@cache
-def get_mongodb_settings() -> MongoDBSettings:
-    return MongoDBSettings()
 
 
 @cache
@@ -168,3 +163,8 @@ def get_redis_settings() -> RedisSettings:
 @cache
 def get_rabbitmq_settings() -> RabbitMQSettings:
     return RabbitMQSettings()
+
+
+@cache
+def get_mongodb_settings() -> MongoDBSettings:
+    return MongoDBSettings()

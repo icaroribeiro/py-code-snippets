@@ -1,0 +1,64 @@
+# Stage 1: Use Python 3.14-bookworm as the base image for the builder stage to ensure compatibility
+FROM python:3.14-bookworm AS base
+
+# Service stage to install dependencies and prepare the application
+FROM base AS builder
+
+# Set the working directory to /app for all subsequent commands
+WORKDIR /app
+
+# Using 'apt-get install -y --no-install-recommends' keeps the image size down.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Configure uv to compile Python bytecode for faster startup and use copy mode to avoid symlink issues
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+
+# Install uv package manager to manage dependencies efficiently
+RUN pip install uv
+
+# Copy only dependency files first to leverage Docker's layer caching
+COPY pyproject.toml uv.lock /app/
+
+# Install dependencies into a virtual environment, caching packages to speed up builds
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --no-dev
+
+# Copy the full application code after dependencies to minimize cache invalidation
+COPY . /app/
+
+# Install the application and dependencies, using verbose output for debugging
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --verbose
+
+# Stage 2: Intermediate stage to install development dependencies and executes the test suite.
+FROM builder AS intermediate
+
+# Sync all dependencies INCLUDING dev packages (like pytest)
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
+
+# Execute the test suite inside the container during the build process
+RUN uv run pytest tests/ --verbose
+
+# Stage 3: Runtime stage using slim image for a smaller, production-ready footprint
+FROM python:3.14-slim-bookworm AS runtime
+
+# Set the working directory to /app in the runtime stage
+WORKDIR /app
+
+RUN apt-get update && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy the entire /app directory (including virtual environment) from the builder stage
+COPY --from=builder /app /app
+
+# Set PYTHONPATH to /app to ensure Python can find modules in the application directory
+ENV PYTHONPATH="/app"
+
+# Add the virtual environment's bin directory to PATH for easy access to executables
+ENV PATH="/app/.venv/bin:$PATH"
+
+# This command only starts the script. The container will keep running until the loop stops
+CMD ["python", "src/main.py"]

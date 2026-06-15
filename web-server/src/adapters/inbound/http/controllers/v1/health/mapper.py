@@ -16,9 +16,6 @@ class ReadinessResponseSchema(BaseModel):
 
 
 class HealthMapper:
-    def __init__(self) -> None:
-        pass
-
     @staticmethod
     def domain_to_response(domain: Health) -> ReadinessResponseSchema:
         """

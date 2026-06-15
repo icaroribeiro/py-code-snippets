@@ -28,31 +28,31 @@ from infrastructure.mongodb.migration_manager import MigrationManager
 from infrastructure.redis.storage import RedisStorage
 
 
-async def init_redis_storage_resource(redis_config: RedisSettings):
-    redis_wrapper = RedisStorage(url=redis_config.backend_url)
+async def init_redis_storage_resource(redis_settings: RedisSettings):
+    redis_wrapper = RedisStorage(url=redis_settings.backend_url)
     await redis_wrapper.init()
     yield redis_wrapper
     await redis_wrapper.shutdown()
 
 
 def init_celery_broker_resource(
-    rabbitmq_config: RabbitMQSettings, redis_config: RedisSettings
+    rabbitmq_settings: RabbitMQSettings, redis_settings: RedisSettings
 ):
     celery_broker_wrapper = CeleryBroker(
-        broker_url=rabbitmq_config.url, backend_url=redis_config.backend_url
+        broker_url=rabbitmq_settings.url, backend_url=redis_settings.backend_url
     )
     celery_broker_wrapper.init()
     yield celery_broker_wrapper
 
 
 async def init_mongodb_database_resource(
-    mongodb_config: MongoDBSettings,
+    mongodb_settings: MongoDBSettings,
     mongo_client: AsyncMongoClient,
     migration_manager: MigrationManager,
 ):
     database_wrapper = MongoDBDatabase(
         client=mongo_client,
-        database_name=mongodb_config.database,
+        database_name=mongodb_settings.database,
         migration_manager=migration_manager,
     )
     await database_wrapper.init()
@@ -61,34 +61,34 @@ async def init_mongodb_database_resource(
 
 
 class Container(containers.DeclarativeContainer):
-    redis_config = providers.Singleton(get_redis_settings)
+    redis_settings = providers.Singleton(get_redis_settings)
 
-    rabbitmq_config = providers.Singleton(get_rabbitmq_settings)
+    rabbitmq_settings = providers.Singleton(get_rabbitmq_settings)
 
-    mongodb_config = providers.Singleton(get_mongodb_settings)
+    mongodb_settings = providers.Singleton(get_mongodb_settings)
 
     redis_storage = providers.Resource(
         init_redis_storage_resource,
-        redis_config=redis_config,
+        redis_settings=redis_settings,
     )
 
     celery_broker = providers.Resource(
         init_celery_broker_resource,
-        rabbitmq_config=rabbitmq_config,
-        redis_config=redis_config,
+        rabbitmq_settings=rabbitmq_settings,
+        redis_settings=redis_settings,
     )
 
-    mongo_client = providers.Singleton(AsyncMongoClient, mongodb_config.provided.uri)
+    mongo_client = providers.Singleton(AsyncMongoClient, mongodb_settings.provided.uri)
     migration_manager = providers.Factory(
         MigrationManager,
-        database_uri=mongodb_config.provided.uri,
-        database_name=mongodb_config.provided.database,
-        migrations_path=mongodb_config.provided.migrations_path,
+        database_uri=mongodb_settings.provided.uri,
+        database_name=mongodb_settings.provided.database,
+        migrations_path=mongodb_settings.provided.migrations_path,
     )
 
     mongodb_database = providers.Resource(
         init_mongodb_database_resource,
-        mongodb_config=mongodb_config,
+        mongodb_settings=mongodb_settings,
         mongo_client=mongo_client,
         migration_manager=migration_manager,
     )

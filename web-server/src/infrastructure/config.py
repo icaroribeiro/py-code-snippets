@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 class HTTPServerSettings(BaseSettings):
     model_config = SettingsConfigDict(  # type: ignore
         env_file=".env",
-        env_prefix="HTTP_SERVER_",
+        env_prefix="HTTP_SERVER",
         env_file_encoding="utf-8",
         extra="ignore",
         env_ignore_extra=True,
@@ -35,7 +35,7 @@ class HTTPServerSettings(BaseSettings):
 class RedisSettings(BaseSettings):
     model_config = SettingsConfigDict(  # type: ignore
         env_file=".env",
-        env_prefix="REDIS_",
+        env_prefix="REDIS",
         env_file_encoding="utf-8",
         extra="ignore",
         env_ignore_extra=True,
@@ -75,7 +75,7 @@ class RedisSettings(BaseSettings):
 class RabbitMQSettings(BaseSettings):
     model_config = SettingsConfigDict(  # type: ignore
         env_file=".env",
-        env_prefix="RABBITMQ_",
+        env_prefix="RABBITMQ",
         env_file_encoding="utf-8",
         extra="ignore",
         env_ignore_extra=True,
@@ -116,7 +116,7 @@ class CelerySettings:
 class MongoDBSettings(BaseSettings):
     model_config = SettingsConfigDict(  # type: ignore
         env_file=".env",
-        env_prefix="MONGODB_",
+        env_prefix="MONGODB",
         env_file_encoding="utf-8",
         extra="ignore",
         env_ignore_extra=True,

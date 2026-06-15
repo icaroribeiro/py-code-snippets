@@ -1,12 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from aiogram import Bot, Dispatcher
-
-
 class TelegramInputPort(ABC):
     @abstractmethod
-    async def foo(
-        self, json_data: dict[str, Any], bot: Bot | None, dispatcher: Dispatcher | None
-    ) -> None:
+    async def process_update(self, raw_update: dict[str, Any]) -> None:
+        """Processes an incoming raw Update payload directly from Telegram's Webhook network boundary."""
         pass

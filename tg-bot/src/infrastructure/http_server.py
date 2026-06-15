@@ -12,7 +12,6 @@ from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)
 
-
 class HTTPServer:
     def __init__(
         self,
@@ -60,10 +59,28 @@ class HTTPServer:
         logger.info("FastAPI lifecycle started successfully.")
         if self.container is not None:
             self.container.init_resources()
+
+            http_client_instance = self.container.http_client()
+            http_client_instance.start()
+
+            telegram_bot = self.container.telegram_bot()
+            telegram_settings = self.container.telegram_settings()
+            if telegram_settings.mode == "webhook":
+                webhook_url = f"{telegram_settings.base_url.rstrip('/')}/webhooks/{telegram_settings.bot_token}"
+                logger.info(f"Configuring active Telegram webhook connection targeting: {webhook_url}")
+                await telegram_bot.set_webhook(
+                    url=webhook_url,
+                    secret_token=telegram_settings.api_secret if telegram_settings.api_secret else None
+                )
+
         logger.info("Infrastructure resources initialized successfully.")
+
         yield
+
         logger.warning("Shutdown signal received. Cleaning up infrastructure...")
         if self.container is not None:
+            http_client_instance = self.container.http_client()
+            await http_client_instance.stop()
             self.container.shutdown_resources()
         logger.info("Infrastructure resources closed cleanly.")
 

@@ -17,7 +17,9 @@ router = APIRouter(prefix="/health")
 
 @cbv(router)
 class HealthController:
-    health_check_use_case: HealthCheckUseCase = Depends(Dependencies.health_use_case)
+    health_check_use_case: HealthCheckUseCase = Depends(
+        Dependencies.health_check_use_case
+    )
 
     @router.get(
         "/liveness",

@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 class HTTPServerSettings(BaseSettings):
     model_config = SettingsConfigDict(  # type: ignore
         env_file=".env",
-        env_prefix="HTTP_SERVER_",
+        env_prefix="HTTP_SERVER",
         env_file_encoding="utf-8",
         extra="ignore",
         env_ignore_extra=True,
@@ -45,10 +45,58 @@ class HTTPClientSettings(BaseSettings):
 
     timeout_seconds: float = Field(default=0)
 
+class TelegramMode(str, Enum):
+    POLLING = "polling"
+    WEBHOOK = "webhook"
+
+
+class TelegramSettings(BaseSettings):
+    model_config = SettingsConfigDict(  # type: ignore
+        env_file=".env",
+        env_prefix="TELEGRAM",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        env_ignore_extra=True,
+        case_sensitive=False,
+    )
+
+    mode: TelegramMode = Field(default=TelegramMode.POLLING)
+    base_url: str = Field(default="your_base_url_here")
+    bot_token: str = Field(default="your_bot_token_here")
+    api_secret: str = Field(default="your_api_secret_here")
+
+
+    @field_validator("mode", mode="before")
+    @classmethod
+    def normalize_mode_to_lowercase(cls, v: Any) -> str:
+        """
+        Intercepts the incoming value for 'mode' and normalizes it to lowercase
+        to ensure seamless Enum alignment, whether it comes as 'WEBHOOK' or 'webhook'.
+        """
+        if isinstance(v, str):
+            normalized = v.strip().lower()
+            logger.debug(f"Normalizing Telegram mode incoming value from '{v}' to '{normalized}'")
+            return normalized
+        return v
+
+
+class TaskServiceSettings(BaseSettings):
+    model_config = SettingsConfigDict(  # type: ignore
+        env_file=".env",
+        env_prefix="TASK_SERVICE",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        env_ignore_extra=True,
+        case_sensitive=False,
+    )
+
+    base_url: str = Field(default="your_base_url_here")
+
+
 class MongoDBSettings(BaseSettings):
     model_config = SettingsConfigDict(  # type: ignore
         env_file=".env",
-        env_prefix="MONGODB_",
+        env_prefix="MONGODB",
         env_file_encoding="utf-8",
         extra="ignore",
         env_ignore_extra=True,
@@ -81,49 +129,24 @@ class MongoDBSettings(BaseSettings):
         uri = f"mongodb://{self.username}:{self.password}@{self.host}:{self.port}"
         return uri
 
-
-class TelegramMode(str, Enum):
-    POLLING = "polling"
-    WEBHOOK = "webhook"
-
-
-class TelegramSettings(BaseSettings):
-    model_config = SettingsConfigDict(  # type: ignore
-        env_file=".env",
-        env_prefix="TELEGRAM_",
-        env_file_encoding="utf-8",
-        extra="ignore",
-        env_ignore_extra=True,
-        case_sensitive=False,
-    )
-
-    mode: TelegramMode = Field(default=TelegramMode.POLLING)
-    bot_token: str = Field(default="your_bot_token_here")
-    api_secret: str = Field(default="your_api_secret_here")
-
-
-    @field_validator("mode", mode="before")
-    @classmethod
-    def normalize_mode_to_lowercase(cls, v: Any) -> str:
-        """
-        Intercepts the incoming value for 'mode' and normalizes it to lowercase
-        to ensure seamless Enum alignment, whether it comes as 'WEBHOOK' or 'webhook'.
-        """
-        if isinstance(v, str):
-            normalized = v.strip().lower()
-            logger.debug(f"Normalizing Telegram mode incoming value from '{v}' to '{normalized}'")
-            return normalized
-        return v
-
 @cache
 def get_http_server_settings() -> HTTPServerSettings:
     return HTTPServerSettings()
 
 
 @cache
+def get_http_client_settings() -> HTTPClientSettings:
+    return HTTPClientSettings()
+
+
+@cache
 def get_telegram_settings() -> TelegramSettings:
     return TelegramSettings()
 
+
+@cache
+def get_task_service_settings() -> TaskServiceSettings:
+    return TaskServiceSettings()
 
 @cache
 def get_mongodb_settings() -> MongoDBSettings:

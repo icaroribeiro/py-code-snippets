@@ -6,7 +6,7 @@ from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)
 
-class HTTPServer:
+class HTTPClient:
     def __init__(self, settings: HTTPClientSettings) -> None:
         self._settings = settings
         self._client: httpx.AsyncClient | None = None

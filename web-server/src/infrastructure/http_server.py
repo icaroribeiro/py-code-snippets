@@ -61,7 +61,9 @@ class HTTPServer:
         if self.container is not None:
             self.container.init_resources()
         logger.info("Infrastructure resources initialized successfully.")
+
         yield
+
         logger.warning("Shutdown signal received. Cleaning up infrastructure...")
         if self.container is not None:
             self.container.shutdown_resources()

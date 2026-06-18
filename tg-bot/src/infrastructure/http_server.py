@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
@@ -11,6 +12,7 @@ from infrastructure.container import Container
 from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)
+
 
 class HTTPServer:
     def __init__(
@@ -57,20 +59,40 @@ class HTTPServer:
     @asynccontextmanager
     async def _lifespan(self, app: FastAPI):
         logger.info("FastAPI lifecycle started successfully.")
+
+        polling_task: asyncio.Task[None] | None = None
+
         if self.container is not None:
             self.container.init_resources()
 
             http_client_instance = self.container.http_client()
             http_client_instance.start()
 
-            telegram_bot = self.container.telegram_bot()
             telegram_settings = self.container.telegram_settings()
+            bot = self.container.bot()
+            telegram_dispatcher = self.container.telegram_dispatcher()
+
             if telegram_settings.mode == "webhook":
                 webhook_url = f"{telegram_settings.base_url.rstrip('/')}/webhooks/{telegram_settings.bot_token}"
-                logger.info(f"Configuring active Telegram webhook connection targeting: {webhook_url}")
-                await telegram_bot.set_webhook(
+                logger.info(
+                    f"Configuring active Telegram webhook connection targeting: {webhook_url}"
+                )
+                await bot.set_webhook(
                     url=webhook_url,
-                    secret_token=telegram_settings.api_secret if telegram_settings.api_secret else None
+                    secret_token=telegram_settings.api_key
+                    if telegram_settings.api_key
+                    else None,
+                )
+            else:
+                logger.info(
+                    "Telegram settings mode is not 'webhook'. Disabling webhook and starting Polling engine..."
+                )
+                await bot.delete_webhook(drop_pending_updates=True)
+                polling_task = asyncio.create_task(
+                    telegram_dispatcher.start_polling(bot)
+                )
+                logger.info(
+                    "Aiogram Polling engine started successfully in background task."
                 )
 
         logger.info("Infrastructure resources initialized successfully.")
@@ -78,10 +100,20 @@ class HTTPServer:
         yield
 
         logger.warning("Shutdown signal received. Cleaning up infrastructure...")
+
+        if polling_task is not None:
+            logger.info("Stopping Telegram Polling engine...")
+            polling_task.cancel()
+            try:
+                await polling_task
+            except asyncio.CancelledError:
+                logger.info("Telegram Polling background task cleanly cancelled.")
+
         if self.container is not None:
             http_client_instance = self.container.http_client()
             await http_client_instance.stop()
             self.container.shutdown_resources()
+
         logger.info("Infrastructure resources closed cleanly.")
 
     def _setup_exception_handlers(self, app: FastAPI) -> None:

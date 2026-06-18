@@ -1,4 +1,5 @@
 from typing import Any
+
 from aiogram import Bot, Dispatcher
 from aiogram.types import Update
 
@@ -8,16 +9,13 @@ from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)
 
+
 class TelegramUseCase(TelegramInputPort):
     def __init__(
-        self,
-        bot: Bot,
-        dispatcher: Dispatcher,
-        task_service: TaskServiceOutputPort
+        self, bot: Bot, dispatcher: Dispatcher, task_service: TaskServiceOutputPort
     ) -> None:
         self._bot = bot
         self._dispatcher = dispatcher
-        self._task_service = task_service
 
     async def process_update(self, raw_update: dict[str, Any]) -> None:
         logger.debug("Feeding raw update payload matrix into aiogram pipeline engine.")

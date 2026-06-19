@@ -2,14 +2,14 @@ from datetime import datetime, timezone
 
 from core.domain.health import Health, HealthStatus
 from core.ports.inbound.health_port import HealthCheckInputPort
-from core.ports.outbound.health_port import HealthCheckerOutputPort
+from core.ports.outbound.health_port import HealthCheckOutputPort
 from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)
 
 
 class HealthCheckUseCase(HealthCheckInputPort):
-    def __init__(self, health_checker: HealthCheckerOutputPort) -> None:
+    def __init__(self, health_checker: HealthCheckOutputPort) -> None:
         self._health_checker = health_checker
 
     async def get_health_status(self) -> Health:

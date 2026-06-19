@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Request, Response, status
 
-from adapters.inbound.http.controllers.v1.telegram.mapper import TelegramMapper
+from adapters.inbound.http.controllers.webhook.mapper import TgMapper
 from adapters.inbound.http.dependencies.dependencies import Dependencies
-from core.ports.inbound.telegram_port import TelegramInputPort
+from core.ports.inbound.webhook_port import TgFeedUpdateInputPort
 from infrastructure.config import get_telegram_settings
 
 telegram_settings = get_telegram_settings()
@@ -19,7 +19,9 @@ async def handle_telegram_webhook(
     request: Request,
     response: Response,
     # x_api_key: Annotated[str | None, Header(alias="x-api-secret")] = None,
-    telegram_use_case: TelegramInputPort = Depends(Dependencies.telegram_use_case),
+    tg_feed_update_use_case: TgFeedUpdateInputPort = Depends(
+        Dependencies.tg_feed_update_use_case
+    ),
 ) -> Response:
     # if telegram_settings.api_key and x_api_key != telegram_settings.api_key:
     #     raise HTTPException(
@@ -27,9 +29,9 @@ async def handle_telegram_webhook(
     #         detail="Invalid API key",
     #     )
     raw_json_payload = await request.json()
-    domain_payload = TelegramMapper.request_to_domain_dict(raw_json_payload)
+    domain_payload = TgMapper.request_to_domain_dict(raw_json_payload)
 
-    await telegram_use_case.process_update(raw_update=domain_payload)
+    await tg_feed_update_use_case.process_update(raw_update=domain_payload)
 
     response.status_code = status.HTTP_200_OK
     return response

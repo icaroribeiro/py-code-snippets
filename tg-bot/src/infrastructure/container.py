@@ -3,18 +3,14 @@ from aiogram_dialog import setup_dialogs
 from dependency_injector import containers, providers
 from pymongo import AsyncMongoClient
 
-from adapters.inbound.telegram.commands.bot_commands import BotCommands
-from adapters.inbound.telegram.handlers.hello_world_handler import (
-    router as hello_world_router,
-)
 from adapters.outbound.external_apis.clients.task_service_client import (
     TaskServiceClient,
 )
-from adapters.outbound.system.health.checker import HealthChecker
+from adapters.outbound.system.health.checker import HealthCheck
 from core.use_cases.health_use_case import HealthCheckUseCase
 from core.use_cases.hello_world_use_case import HelloWorldUseCase
 from core.use_cases.task_callback_use_case import TaskCallbackUseCase
-from core.use_cases.telegram_use_case import TelegramUseCase
+from core.use_cases.tg_feed_update_use_case import TgFeedUpdateUseCase
 from infrastructure.config import (
     MongoDBSettings,
     get_http_client_settings,
@@ -26,6 +22,7 @@ from infrastructure.cross_cutting.i18n_service import I18nService
 from infrastructure.http_client import HTTPClient
 from infrastructure.mongodb.database import MongoDBDatabase
 from infrastructure.mongodb.migration_manager import MigrationManager
+from infrastructure.telegram.menu.bot_menu import TgBotMenu
 
 
 async def init_mongodb_database_resource(
@@ -44,13 +41,12 @@ async def init_mongodb_database_resource(
 
 
 def init_telegram_dispatcher(
-    bot: Bot, i18n_service: I18nService, hello_world_use_case: HelloWorldUseCase
+    tg_bot_commands: TgBotMenu, hello_world_use_case: HelloWorldUseCase
 ) -> Dispatcher:
     dp = Dispatcher()
-    bot_commands = BotCommands(i18n_service=i18n_service)
-    dp.startup.register(bot_commands.register_all)
-    dp["hello_world_use_case"] = hello_world_use_case
-    dp.include_router(hello_world_router)
+    dp.startup.register(tg_bot_commands.register_all)
+    # dp["hello_world_use_case"] = hello_world_use_case
+    # dp.include_router(hello_world_router)
     setup_dialogs(dp)
     return dp
 
@@ -63,6 +59,15 @@ class Container(containers.DeclarativeContainer):
     task_service_settings = providers.Singleton(get_task_service_settings)
 
     mongodb_settings = providers.Singleton(get_mongodb_settings)
+
+    bot = providers.Singleton(
+        Bot,
+        token=telegram_settings.provided.bot_token,
+    )
+
+    i18n_service = providers.Singleton(I18nService, default_lang="en-US")
+
+    tg_bot_commands = providers.Singleton(TgBotMenu, i18n_service)
 
     mongo_client = providers.Singleton(AsyncMongoClient, mongodb_settings.provided.uri)
     migration_manager = providers.Factory(
@@ -80,7 +85,7 @@ class Container(containers.DeclarativeContainer):
     )
 
     health_checker_adapter = providers.Factory(
-        HealthChecker,
+        HealthCheck,
         mongodb_database=mongodb_database,
     )
 
@@ -97,13 +102,6 @@ class Container(containers.DeclarativeContainer):
         health_checker=health_checker_adapter,
     )
 
-    i18n_service = providers.Singleton(I18nService, default_lang="en-US")
-
-    bot = providers.Singleton(
-        Bot,
-        token=telegram_settings.provided.bot_token,
-    )
-
     heelo_worold_use_case = providers.Factory(
         HelloWorldUseCase,
         bot=bot,
@@ -111,16 +109,12 @@ class Container(containers.DeclarativeContainer):
 
     telegram_dispatcher = providers.Singleton(
         init_telegram_dispatcher,
-        bot=bot,
-        i18n_service=i18n_service,
+        tg_bot_commands=tg_bot_commands,
         hello_world_use_case=heelo_worold_use_case,
     )
 
-    telegram_use_case = providers.Factory(
-        TelegramUseCase,
-        bot=bot,
-        dispatcher=telegram_dispatcher,
-        task_service=task_service_client_adapter,
+    tg_feed_update_use_case = providers.Factory(
+        TgFeedUpdateUseCase, bot=bot, dispatcher=telegram_dispatcher
     )
 
     task_callback_use_case = providers.Singleton(

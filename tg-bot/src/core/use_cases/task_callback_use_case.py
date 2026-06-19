@@ -3,7 +3,7 @@ import logging
 from aiogram import Bot
 
 from core.domain.task import TaskResult, TaskStatus, TaskType
-from core.ports.inbound.task_callback_port import TaskCallbackInputPort
+from core.ports.inbound.task_port import TaskCallbackInputPort
 from infrastructure.cross_cutting.i18n_service import I18nService
 
 logger = logging.getLogger(__name__)

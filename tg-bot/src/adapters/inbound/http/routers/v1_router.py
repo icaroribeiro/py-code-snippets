@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from adapters.inbound.http.controllers.v1.health.controller import (
     router as health_router,
 )
-from adapters.inbound.http.controllers.v1.task_callback.controller import (
+from adapters.inbound.http.controllers.v1.task.controller import (
     router as task_callback_router,
 )
 

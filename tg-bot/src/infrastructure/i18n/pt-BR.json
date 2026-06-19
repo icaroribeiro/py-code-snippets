@@ -1,11 +1,6 @@
 {
-    "cmd_desc_start": "Inicia o menu principal e diálogos do bot",
-    "cmd_desc_hello_world": "Olá Mundo",
-    "cmd_desc_help": "Visualiza as instruções e comandos disponíveis",
-    "cmd_desc_exit": "Exit the bot",
-    "welcome_msg": "Olá! Bem-vindo ao nosso bot de assistência à saúde.",
-    "error_generic": "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
-    "task_error_generic": "❌ **Ops! Ocorreu um erro ao processar a sua solicitação em background.**",
-    "task_type_unknown": "⚠️ **Tarefa concluída, mas o formato de resposta não é reconhecido pelo sistema.**",
-    "task_success_random_number": "🎉 **Sua tarefa foi concluída com sucesso!**\n\n🎲 **Operação:** Geração de Número Randômico\n **Resultado Gerado:** `{value}`"
+    "cmd_start": "Iniciar / Reiniciar o bot",
+    "cmd_menu": "Ver menu principal",
+    "cmd_help": "Central de ajuda",
+    "cmd_support": "Falar com suporte humano"
 }

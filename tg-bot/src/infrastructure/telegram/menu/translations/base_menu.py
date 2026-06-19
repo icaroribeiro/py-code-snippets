@@ -5,7 +5,7 @@ from aiogram import types
 from infrastructure.cross_cutting.i18n_service import I18nService
 
 
-class BaseCommands(ABC):
+class BaseMenu(ABC):
     def __init__(self, i18n_service: I18nService) -> None:
         self._i18n_service = i18n_service
 
@@ -14,7 +14,7 @@ class BaseCommands(ABC):
         pass
 
     @abstractmethod
-    def hello_world(self) -> types.BotCommand:
+    def menu(self) -> types.BotCommand:
         pass
 
     @abstractmethod
@@ -22,8 +22,8 @@ class BaseCommands(ABC):
         pass
 
     @abstractmethod
-    def exit(self) -> types.BotCommand:
+    def support(self) -> types.BotCommand:
         pass
 
     def to_list(self) -> list[types.BotCommand]:
-        return [self.start(), self.hello_world(), self.help(), self.exit()]
+        return [self.start(), self.menu(), self.help(), self.support()]

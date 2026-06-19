@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, Response, status
 
-from adapters.inbound.http.controllers.v1.task_callback.mapper import (
+from adapters.inbound.http.controllers.v1.task.mapper import (
     TaskCallbackMapper,
     TaskCallbackRequestSchema,
 )
 from adapters.inbound.http.dependencies.dependencies import Dependencies
-from core.ports.inbound.task_callback_port import TaskCallbackInputPort
+from core.ports.inbound.task_port import TaskCallbackInputPort
 from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)

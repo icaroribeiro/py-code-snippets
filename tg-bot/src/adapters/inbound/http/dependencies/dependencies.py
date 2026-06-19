@@ -5,8 +5,8 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 
 from core.ports.inbound.health_port import HealthCheckInputPort
-from core.ports.inbound.task_callback_port import TaskCallbackInputPort
-from core.ports.inbound.telegram_port import TelegramInputPort
+from core.ports.inbound.task_port import TaskCallbackInputPort
+from core.ports.inbound.webhook_port import TgFeedUpdateInputPort
 from infrastructure.container import Container
 
 
@@ -23,13 +23,13 @@ class Dependencies:
 
     @staticmethod
     @inject
-    async def telegram_use_case(
-        telegram_use_case: Annotated[
-            TelegramInputPort,
-            Depends(Provide[Container.telegram_use_case]),
+    async def tg_feed_update_use_case(
+        tg_feed_update_use_case: Annotated[
+            TgFeedUpdateInputPort,
+            Depends(Provide[Container.tg_feed_update_use_case]),
         ],
-    ) -> TelegramInputPort:
-        return telegram_use_case
+    ) -> TgFeedUpdateInputPort:
+        return tg_feed_update_use_case
 
     @staticmethod
     @inject

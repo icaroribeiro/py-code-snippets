@@ -3,17 +3,14 @@ from typing import Any
 from aiogram import Bot, Dispatcher
 from aiogram.types import Update
 
-from core.ports.inbound.telegram_port import TelegramInputPort
-from core.ports.outbound.task_port import TaskServiceOutputPort
+from core.ports.inbound.webhook_port import TgFeedUpdateInputPort
 from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)
 
 
-class TelegramUseCase(TelegramInputPort):
-    def __init__(
-        self, bot: Bot, dispatcher: Dispatcher, task_service: TaskServiceOutputPort
-    ) -> None:
+class TgFeedUpdateUseCase(TgFeedUpdateInputPort):
+    def __init__(self, bot: Bot, dispatcher: Dispatcher) -> None:
         self._bot = bot
         self._dispatcher = dispatcher
 

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from core.domain.health import Health
+from core.domain import Health
 
 
 class HealthCheckInputPort(ABC):

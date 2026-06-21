@@ -1,7 +1,7 @@
 import asyncio
 from typing import Dict
 
-from core.domain.health import HealthStatus
+from core.domain import HealthStatus
 from core.ports.outbound.health_port import HealthCheckOutputPort
 from infrastructure.cross_cutting.logging import get_logger
 from infrastructure.mongodb.database import MongoDBDatabase

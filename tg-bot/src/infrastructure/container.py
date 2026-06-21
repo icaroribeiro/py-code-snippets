@@ -2,7 +2,8 @@ from aiogram import Bot, Dispatcher
 from dependency_injector import containers, providers
 from pymongo import AsyncMongoClient
 
-from adapters.inbound.telegram.menus.bot_menu import BotMenu
+from adapters.inbound.telegram.dispatcher import TelegramDispatcher
+from adapters.inbound.telegram.menus.bot_menu import TelegramBotMenu
 from adapters.outbound.external_apis.task_service_api import TaskServiceApi
 from adapters.outbound.system.health_check import HealthCheck
 from core.use_cases.health_use_case import HealthCheckUseCase
@@ -21,7 +22,6 @@ from infrastructure.http_client import HTTPClient
 from infrastructure.i18n.localization_service import LocalizationService
 from infrastructure.mongodb.database import MongoDBDatabase
 from infrastructure.mongodb.migration_manager import MigrationManager
-from infrastructure.telegram.dispatcher import TelegramDispatcher
 
 
 async def init_mongodb_database_resource(
@@ -39,8 +39,12 @@ async def init_mongodb_database_resource(
     await database_wrapper.shutdown()
 
 
-def init_telegram_dispatcher(bot_menu: BotMenu) -> Dispatcher:
-    dispatcher_wrapper = TelegramDispatcher(bot_menu=bot_menu)
+def init_telegram_dispatcher(
+    bot_menu: TelegramBotMenu, localization_service: LocalizationService
+) -> Dispatcher:
+    dispatcher_wrapper = TelegramDispatcher(
+        bot_menu=bot_menu, localization_service=localization_service
+    )
     return dispatcher_wrapper.init()
 
 
@@ -62,7 +66,7 @@ class Container(containers.DeclarativeContainer):
         LocalizationService, default_lang="en-US"
     )
 
-    bot_menu = providers.Singleton(BotMenu, localization_service)
+    telegram_bot_menu = providers.Singleton(TelegramBotMenu, localization_service)
 
     mongo_client = providers.Singleton(AsyncMongoClient, mongodb_settings.provided.uri)
     migration_manager = providers.Factory(
@@ -97,10 +101,14 @@ class Container(containers.DeclarativeContainer):
         health_checker=health_checker_adapter,
     )
 
-    dispatcher = providers.Singleton(init_telegram_dispatcher, bot_menu=bot_menu)
+    telegram_dispatcher = providers.Singleton(
+        init_telegram_dispatcher,
+        bot_menu=telegram_bot_menu,
+        localization_service=localization_service,
+    )
 
     telegram_webhook_use_case = providers.Factory(
-        TelegramWebhookUseCase, bot=bot, dispatcher=dispatcher
+        TelegramWebhookUseCase, bot=bot, dispatcher=telegram_dispatcher
     )
 
     telegram_task_callback_use_case = providers.Singleton(

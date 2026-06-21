@@ -3,7 +3,9 @@
     "cmd_menu": "View main menu",
     "cmd_help": "Help Center",
     "cmd_support": "Talk to human support",
-    "welcome_intro_text": "👋 Welcome to our assistant! It is great to have you here.",
-    "help_panel_text": "🛟 <b>Help Center</b>\n\nChoose one of the options below directly in the interactive menu or type /menu to navigate.",
-    "support_direct_text": "👤 <b>Talk to Support</b>\n\nYour support token has been generated. An analyst will contact you in this chat shortly."
+    "bot_pre_start_description": "Hello! This is the FooBar virtual assistant.\n\nTo start your service, click below on the 'Start Bot' button.",
+    "welcome_short_intro": "Welcome to the assisted system!",
+    "welcome_message": "Use the 'Menu' button located in the bottom left corner or type commands directly into the chat.",
+    "help_panel_text": "<b>Help Center</b>\n\nChoose one of the options below directly in the interactive menu or type /menu to navigate.",
+    "support_direct_text": "<b>Talk to Support</b>\n\nYour support token has been generated. An analyst will contact you in this chat shortly."
 }

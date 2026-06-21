@@ -2,7 +2,7 @@ from fastapi import HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from core.domain.errors import CoreError, CoreErrorCategory
+from core.domain import CoreError, CoreErrorCategory
 from infrastructure.cross_cutting.logging import get_logger
 
 logger = get_logger(__name__)
@@ -17,7 +17,7 @@ class HTTPExceptionHandler:
     }
 
     @staticmethod
-    async def handle_core_error(request: Request, exc: Exception) -> JSONResponse:
+    async def handle_core_error(request: Request, exc: CoreError) -> JSONResponse:
         if not isinstance(exc, CoreError):
             return JSONResponse(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -48,7 +48,9 @@ class HTTPExceptionHandler:
         return JSONResponse(content=content, status_code=status_code)
 
     @staticmethod
-    async def handle_http_exception(request: Request, exc: Exception) -> JSONResponse:
+    async def handle_http_exception(
+        request: Request, exc: HTTPException
+    ) -> JSONResponse:
         if not isinstance(exc, HTTPException):
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
             detail = str(exc)
@@ -62,7 +64,9 @@ class HTTPExceptionHandler:
         )
 
     @staticmethod
-    async def handle_validation_error(request: Request, exc: Exception) -> JSONResponse:
+    async def handle_validation_error(
+        request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
         if not isinstance(exc, RequestValidationError):
             errors_detail = None
         else:

@@ -8,7 +8,7 @@ from adapters.inbound.http.controllers.v1.health.mapper import (
 from adapters.inbound.http.dependencies.dependencies import (
     Dependencies,
 )
-from core.domain.health import HealthStatus
+from core.domain import HealthStatus
 from core.ports.inbound.health_port import HealthCheckInputPort
 
 router = APIRouter(prefix="/health")

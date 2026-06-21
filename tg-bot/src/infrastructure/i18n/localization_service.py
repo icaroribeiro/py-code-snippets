@@ -11,7 +11,7 @@ class LocalizationService:
 
     def __init__(self, default_lang: str = "en-US") -> None:
         self._default_lang = default_lang
-        self._base_path = Path(__file__).resolve().parents[1] / "i18n"
+        self._base_path = Path(__file__).resolve().parent / "locales"
 
     @cache
     def _load_json_file(self, lang: str) -> dict:

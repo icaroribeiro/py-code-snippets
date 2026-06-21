@@ -3,7 +3,7 @@ from typing import Any
 from aiogram import Bot, Dispatcher
 from aiogram.types import Update
 
-from core.domain.task import TaskResult, TaskStatus, TaskType
+from core.domain import TaskResult, TaskStatus, TaskType
 from core.ports.inbound.telegram_port import (
     TelegramTaskCallbackInputPort,
     TelegramWebhookInputPort,

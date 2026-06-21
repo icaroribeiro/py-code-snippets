@@ -2,7 +2,7 @@ from typing import Dict
 
 from pydantic import BaseModel, Field
 
-from core.domain.health import Health
+from core.domain import Health
 
 
 class LivenessResponseSchema(BaseModel):

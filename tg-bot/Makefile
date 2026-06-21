@@ -7,7 +7,7 @@ add-migration:
 	@beanie new-migration -n $(MIGRATION_NAME) -p src/infrastructure/mongodb/migrations
 
 migrate:
-	@PYTHONPATH=src uv run scripts/run_migrations.py
+	@PYTHONPATH=src uv run python -m scripts/run_migrations.py
 
 init-infra:
 	@docker-compose up --build -d mongodb redis rabbitmq
@@ -16,13 +16,13 @@ shutdown-infra:
 	@docker-compose down -v
 
 run-dev:
-	@PYTHONPATH=src uv run uvicorn src.main:app --reload --reload-dir src
+	@PYTHONPATH=src uv run python -m uvicorn src.main:app --reload --reload-dir src --reload-include '*.json'
 
 run:
-	@PYTHONPATH=src uv run uvicorn src.infrastructure.http_server.init:app --workers 4
+	@PYTHONPATH=src uv run python -m uvicorn src.infrastructure.http_server.init:app --workers 4
 
 run-worker:
-	@PYTHONPATH=src uv run celery -A src.infrastructure.celery worker --loglevel=info -P solo --without-mingle --without-gossip
+	@PYTHONPATH=src uv run python -m celery -A src.infrastructure.celery worker --loglevel=info -P solo --without-mingle --without-gossip
 
 test-dev:
 	@uv run pytest

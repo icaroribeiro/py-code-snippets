@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from core.domain.health import Health, HealthStatus
+from core.domain import Health, HealthStatus
 from core.ports.inbound.health_port import HealthCheckInputPort
 from core.ports.outbound.health_port import HealthCheckOutputPort
 from infrastructure.cross_cutting.logging import get_logger

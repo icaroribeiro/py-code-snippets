@@ -11,7 +11,7 @@ from adapters.inbound.http.controllers.v1.health.router import (
     router as health_router,
 )
 from adapters.inbound.http.handlers.exception_handler import HTTPExceptionHandler
-from core.domain.errors import CoreError
+from core.domain import CoreError
 from infrastructure.config import HTTPServerSettings
 from infrastructure.container import Container
 from infrastructure.cross_cutting.logging import get_logger

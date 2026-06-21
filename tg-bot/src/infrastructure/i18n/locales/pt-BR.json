@@ -3,7 +3,9 @@
     "cmd_menu": "Ver menu principal",
     "cmd_help": "Central de ajuda",
     "cmd_support": "Falar com suporte humano",
-    "welcome_intro_text": "👋 Bem-vindo ao nosso assistente! É muito bom ter você por aqui.",
-    "help_panel_text": "🛟 <b>Central de Ajuda</b>\n\nEscolha uma das opções abaixo diretamente no menu interativo ou digite /menu para navegar.",
-    "support_direct_text": "👤 <b>Falar com o Suporte</b>\n\nSeu token de atendimento foi gerado. Um analista entrará em contato neste chat em breve."
+    "bot_pre_start_description": "Olá! Este é o assistente virtual do FooBar.\n\nPara iniciar o seu atendimento, por favor utilize o botão 'Menu' no canto esquerdo da sua tela e clique na opção 'Começar' (/start).",
+    "welcome_short_intro": "Bem-vindo ao sistema assistido!",
+    "welcome_message": "Para navegar pelas funcionalidades do assistente, utilize o botão <b>Menu</b> localizado no canto inferior esquerdo ou digite os comandos diretamente no chat.",
+    "help_panel_text": "<b>Central de Ajuda</b>\n\nEscolha uma das opções abaixo diretamente no menu interativo ou digite /menu para navegar.",
+    "support_direct_text": "<b>Falar com o Suporte</b>\n\nSeu token de atendimento foi gerado. Um analista entrará em contato neste chat em breve."
 }

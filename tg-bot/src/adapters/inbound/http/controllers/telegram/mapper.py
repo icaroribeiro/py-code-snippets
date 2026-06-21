@@ -2,7 +2,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from core.domain.task import TaskResult, TaskStatus, TaskType
+from core.domain import TaskResult, TaskStatus, TaskType
 
 
 class TelegramWebhookMapper:

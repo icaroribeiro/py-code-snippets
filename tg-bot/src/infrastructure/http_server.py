@@ -4,11 +4,11 @@ from contextlib import asynccontextmanager
 from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 
-from adapters.inbound.http.controllers.telegram.router import (
-    router as telegram_router,
+from adapters.inbound.http.controllers.telegram import (
+    telegram_router,
 )
-from adapters.inbound.http.controllers.v1.health.router import (
-    router as health_router,
+from adapters.inbound.http.controllers.v1.health import (
+    health_router,
 )
 from adapters.inbound.http.handlers.exception_handler import HTTPExceptionHandler
 from core.domain import CoreError

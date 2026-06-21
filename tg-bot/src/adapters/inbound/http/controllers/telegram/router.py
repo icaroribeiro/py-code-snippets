@@ -17,10 +17,10 @@ logger = get_logger(__name__)
 
 telegram_settings = get_telegram_settings()
 
-router = APIRouter(prefix="/telegram", tags=["Telegram"])
+telegram_router = APIRouter(prefix="/telegram", tags=["Telegram"])
 
 
-@router.post(
+@telegram_router.post(
     f"/webooks/{telegram_settings.bot_token}",
     status_code=status.HTTP_200_OK,
     summary="Receive real-time encoded payload updates from Telegram Bot API",
@@ -41,7 +41,7 @@ async def handle_telegram_webhook(
     return response
 
 
-@router.post("/task-callbacks", status_code=status.HTTP_200_OK)
+@telegram_router.post("/task-callbacks", status_code=status.HTTP_200_OK)
 async def handle_task_callback(
     payload: TelegramTaskCallbackRequestSchema,
     response: Response,

@@ -11,10 +11,10 @@ from adapters.inbound.http.dependencies.dependencies import (
 from core.domain import HealthStatus
 from core.ports.inbound.health_port import HealthCheckInputPort
 
-router = APIRouter(prefix="/health")
+health_router = APIRouter(prefix="/health")
 
 
-@router.get(
+@health_router.get(
     "/liveness",
     response_model=LivenessResponseSchema,
     summary="Check if the API process is running natively",
@@ -29,7 +29,7 @@ async def get_liveness_status() -> LivenessResponseSchema:
     return LivenessResponseSchema(status="healthy")
 
 
-@router.get(
+@health_router.get(
     "/readiness",
     response_model=ReadinessResponseSchema,
     summary="Check health of all active sub-systems and infrastructure resources",

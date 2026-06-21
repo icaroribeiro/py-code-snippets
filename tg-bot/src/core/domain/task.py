@@ -19,5 +19,5 @@ class TaskResult:
     task_type: TaskType
     chat_id: int
     status: TaskStatus
-    result_data: dict[str, Any]
     lang: str
+    result_data: dict[str, Any]

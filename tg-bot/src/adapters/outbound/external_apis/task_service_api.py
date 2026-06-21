@@ -1,12 +1,14 @@
 from typing import Any
 
-from core.ports.outbound.task_port import TaskServiceOutputPort
-from infrastructure.config import TaskServiceSettings
+from core.ports.outbound.task_port import TaskServiceApiOutputPort
+from infrastructure.config import TaskServiceApiSettings
 from infrastructure.http_client import HTTPClient
 
 
-class TaskServiceClient(TaskServiceOutputPort):
-    def __init__(self, http_client: HTTPClient, settings: TaskServiceSettings) -> None:
+class TaskServiceApi(TaskServiceApiOutputPort):
+    def __init__(
+        self, http_client: HTTPClient, settings: TaskServiceApiSettings
+    ) -> None:
         self._http_client = http_client
         self._settings = settings
 

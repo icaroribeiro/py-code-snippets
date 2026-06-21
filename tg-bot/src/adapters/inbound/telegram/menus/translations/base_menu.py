@@ -2,12 +2,12 @@ from abc import ABC, abstractmethod
 
 from aiogram import types
 
-from infrastructure.cross_cutting.i18n_service import I18nService
+from infrastructure.i18n.localization_service import LocalizationService
 
 
 class BaseMenu(ABC):
-    def __init__(self, i18n_service: I18nService) -> None:
-        self._i18n_service = i18n_service
+    def __init__(self, localization_service: LocalizationService) -> None:
+        self._localization_service = localization_service
 
     @abstractmethod
     def start(self) -> types.BotCommand:

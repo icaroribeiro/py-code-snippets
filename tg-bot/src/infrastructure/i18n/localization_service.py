@@ -6,7 +6,9 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-class I18nService:
+class LocalizationService:
+    """Responsible for the internationalization and localization of texts."""
+
     def __init__(self, default_lang: str = "en-US") -> None:
         self._default_lang = default_lang
         self._base_path = Path(__file__).resolve().parents[1] / "i18n"

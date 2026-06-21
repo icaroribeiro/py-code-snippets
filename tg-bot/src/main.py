@@ -10,8 +10,6 @@ from infrastructure.http_server import HTTPServer
 
 logger = get_logger(__name__)
 
-Logging.init()
-
 
 def create_app() -> FastAPI:
     """
@@ -40,9 +38,6 @@ def create_app() -> FastAPI:
         sys.exit(1)
 
 
-app = create_app()
-
-
 async def init_http_server() -> None:
     """Initializes and runs the FastAPI application server via Uvicorn within the active loop."""
     logger.info("Starting HTTP server supervisor...")
@@ -66,6 +61,10 @@ async def init_http_server() -> None:
     except Exception as error:
         logger.error(f"Server crashed during runtime execution: {repr(error)}")
         sys.exit(1)
+
+
+Logging.init()
+app = create_app()
 
 
 if __name__ == "__main__":

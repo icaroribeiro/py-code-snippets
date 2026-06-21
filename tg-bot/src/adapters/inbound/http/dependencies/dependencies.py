@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from aiogram import Bot
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends
 
 from core.ports.inbound.health_port import HealthCheckInputPort
-from core.ports.inbound.task_port import TaskCallbackInputPort
-from core.ports.inbound.webhook_port import TgFeedUpdateInputPort
+from core.ports.inbound.telegram_port import (
+    TelegramTaskCallbackInputPort,
+    TelegramWebhookInputPort,
+)
 from infrastructure.container import Container
 
 
@@ -23,29 +24,29 @@ class Dependencies:
 
     @staticmethod
     @inject
-    async def tg_feed_update_use_case(
-        tg_feed_update_use_case: Annotated[
-            TgFeedUpdateInputPort,
-            Depends(Provide[Container.tg_feed_update_use_case]),
+    async def telegram_webhook_use_case(
+        telegram_webhook_use_case: Annotated[
+            TelegramWebhookInputPort,
+            Depends(Provide[Container.telegram_webhook_use_case]),
         ],
-    ) -> TgFeedUpdateInputPort:
-        return tg_feed_update_use_case
+    ) -> TelegramWebhookInputPort:
+        return telegram_webhook_use_case
 
     @staticmethod
     @inject
-    async def task_callback_use_case(
-        task_callback_use_case: TaskCallbackInputPort = Depends(
-            Provide[Container.task_callback_use_case]
+    async def telegram_task_callback_use_case(
+        telegram_task_callback_use_case: TelegramTaskCallbackInputPort = Depends(
+            Provide[Container.telegram_task_callback_use_case]
         ),
-    ) -> TaskCallbackInputPort:
-        return task_callback_use_case
+    ) -> TelegramTaskCallbackInputPort:
+        return telegram_task_callback_use_case
 
-    @staticmethod
-    @inject
-    async def bot(
-        bot: Annotated[
-            Bot,
-            Depends(Provide[Container.bot]),
-        ],
-    ) -> Bot:
-        return bot
+    # @staticmethod
+    # @inject
+    # async def bot(
+    #     bot: Annotated[
+    #         Bot,
+    #         Depends(Provide[Container.bot]),
+    #     ],
+    # ) -> Bot:
+    #     return bot

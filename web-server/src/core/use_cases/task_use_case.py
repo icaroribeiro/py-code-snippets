@@ -2,10 +2,10 @@ from typing import Any
 
 from core.domain.task import Task
 from core.ports.inbound.task_port import TaskEmailInputPort, TaskRandomNumberInputPort
-from core.ports.outbound.task_port import (
+from core.ports.outbound import (
     TaskOrchestratorOutputPort,
 )
-from infrastructure.cross_cutting.logging import get_logger
+from infrastructure.cross_cutting import get_logger
 
 logger = get_logger(__name__)
 

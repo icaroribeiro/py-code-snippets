@@ -1,5 +1,5 @@
 import redis.asyncio as aioredis
-from infrastructure.cross_cutting.logging import get_logger
+from infrastructure.cross_cutting import get_logger
 
 logger = get_logger(__name__)
 

@@ -5,7 +5,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from infrastructure.config import get_http_server_settings
-from infrastructure.cross_cutting.logging import Logging, get_logger
+from infrastructure.cross_cutting import Logging, get_logger
 from infrastructure.http_server import HTTPServer
 
 logger = get_logger(__name__)

@@ -1,7 +1,7 @@
 from celery import Celery
 
 from infrastructure.config import CelerySettings
-from infrastructure.cross_cutting.logging import Logging, get_logger
+from infrastructure.cross_cutting import Logging, get_logger
 
 logger = get_logger(__name__)
 

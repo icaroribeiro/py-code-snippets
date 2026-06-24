@@ -1,10 +1,10 @@
 import json
 from typing import Any
 
-from core.ports.outbound.task_port import (
+from core.ports.outbound import (
     TaskPublisherOutputPort,
 )
-from infrastructure.cross_cutting.logging import get_logger
+from infrastructure.cross_cutting import get_logger
 from infrastructure.redis.storage import RedisStorage
 
 logger = get_logger(__name__)

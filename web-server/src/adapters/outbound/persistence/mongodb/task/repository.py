@@ -7,7 +7,7 @@ from adapters.outbound.persistence.mongodb.task.mapper import (
     TaskMapper,
 )
 from core.domain.task import Task
-from core.ports.outbound.task_port import (
+from core.ports.outbound import (
     TaskRepositoryOutputPort,
 )
 

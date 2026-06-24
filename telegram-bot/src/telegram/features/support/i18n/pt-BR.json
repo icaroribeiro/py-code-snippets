@@ -1,0 +1,6 @@
+{
+  "cmd_help": "Central de ajuda",
+  "cmd_support": "Falar com suporte humano",
+  "help_panel_text": "<b>Central de Ajuda</b>\n\nEscolha uma das opções abaixo diretamente no menu interativo ou digite /menu para navegar.",
+  "support_direct_text": "<b>Falar com o Suporte</b>\n\nSeu token de atendimento foi gerado. Um analista entrará em contato neste chat em breve."
+}

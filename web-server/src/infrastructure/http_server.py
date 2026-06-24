@@ -8,7 +8,7 @@ from adapters.inbound.http.routers.root_router import root_router
 from core.domain.errors import CoreError
 from infrastructure.config import HTTPServerSettings
 from infrastructure.container import Container
-from infrastructure.cross_cutting.logging import get_logger
+from infrastructure.cross_cutting import get_logger
 
 logger = get_logger(__name__)
 

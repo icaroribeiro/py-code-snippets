@@ -3,11 +3,11 @@ from typing import Any
 
 from celery import signature
 from core.domain.task import Task, TaskStatus
-from core.ports.outbound.task_port import (
+from core.ports.outbound import (
     TaskOrchestratorOutputPort,
     TaskRepositoryOutputPort,
 )
-from infrastructure.cross_cutting.logging import get_logger
+from infrastructure.cross_cutting import get_logger
 
 logger = get_logger(__name__)
 

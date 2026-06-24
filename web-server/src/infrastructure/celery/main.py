@@ -5,7 +5,7 @@ import sys
 from celery import Celery
 
 from infrastructure.container import Container
-from infrastructure.cross_cutting.logging import Logging, get_logger
+from infrastructure.cross_cutting import Logging, get_logger
 
 logger = get_logger(__name__)
 

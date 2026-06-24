@@ -10,7 +10,7 @@ from beanie.migrations.runner import MigrationNode
 
 from adapters.outbound.persistence.mongodb.task.documents import TaskDocument
 from infrastructure.config import MongoDBSettings
-from infrastructure.cross_cutting.logging import Logging, get_logger
+from infrastructure.cross_cutting import Logging, get_logger
 
 logger = get_logger("")
 

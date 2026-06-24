@@ -4,7 +4,7 @@ from typing import Any, AsyncGenerator, Optional
 
 from core.domain.errors import CoreError, CoreErrorCategory
 from core.domain.task import Task as DomainTask
-from core.ports.outbound.task_port import (
+from core.ports.outbound import (
     TaskPublisherOutputPort,
     TaskRepositoryOutputPort,
 )

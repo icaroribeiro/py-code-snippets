@@ -5,7 +5,7 @@ from pymongo.asynchronous.database import AsyncDatabase
 from adapters.outbound.persistence.mongodb.task.documents import (
     TaskDocument,
 )
-from infrastructure.cross_cutting.logging import get_logger
+from infrastructure.cross_cutting import get_logger
 from infrastructure.mongodb.migration_manager import MigrationManager
 
 logger = get_logger(__name__)

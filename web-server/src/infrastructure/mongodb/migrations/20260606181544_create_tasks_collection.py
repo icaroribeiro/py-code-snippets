@@ -4,7 +4,7 @@ from pymongo.asynchronous.client_session import AsyncClientSession
 from adapters.outbound.persistence.mongodb.task.documents import (
     TaskDocument,
 )
-from infrastructure.cross_cutting.logging import get_logger
+from infrastructure.cross_cutting import get_logger
 
 logger = get_logger(__name__)
 

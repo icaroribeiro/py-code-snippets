@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from core.domain.health import Health, HealthStatus
 from core.ports.inbound.health_port import HealthCheckInputPort
 from core.ports.outbound.health_port import HealthCheckerOutputPort
-from infrastructure.cross_cutting.logging import get_logger
+from infrastructure.cross_cutting import get_logger
 
 logger = get_logger(__name__)
 

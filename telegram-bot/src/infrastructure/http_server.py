@@ -1,15 +1,10 @@
 import asyncio
 from contextlib import asynccontextmanager
 
-from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 
-from adapters.inbound.http.controllers.telegram import (
-    telegram_router,
-)
-from adapters.inbound.http.controllers.v1.health import (
-    health_router,
-)
+from adapters.inbound.http.controllers import controllers_router
 from adapters.inbound.http.handlers import HTTPExceptionHandler
 from core.domain import CoreError
 from infrastructure.config import HTTPServerSettings
@@ -122,14 +117,7 @@ class HTTPServer:
         logger.info("Infrastructure resources closed cleanly.")
 
     def _setup_routers(self, app: FastAPI) -> None:
-        v1_router = APIRouter(prefix="/v1")
-        v1_router.include_router(health_router, tags=["Health Checks V1 Endpoints"])
-
-        root_router = APIRouter()
-        root_router.include_router(v1_router, prefix="/api")
-        root_router.include_router(telegram_router, tags=["Telegram Endpoints"])
-
-        app.include_router(root_router)
+        app.include_router(controllers_router)
 
     def _setup_exception_handlers(self, app: FastAPI) -> None:
         app.add_exception_handler(CoreError, HTTPExceptionHandler.handle_core_error)

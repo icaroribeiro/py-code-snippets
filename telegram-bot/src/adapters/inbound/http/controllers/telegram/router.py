@@ -17,11 +17,11 @@ logger = get_logger(__name__)
 
 telegram_settings = get_telegram_settings()
 
-telegram_router = APIRouter(prefix="/telegram", tags=["Telegram"])
+telegram_router = APIRouter(prefix="/telegram")
 
 
 @telegram_router.post(
-    f"/webooks/{telegram_settings.bot_token}",
+    f"/webhook/{telegram_settings.bot_token}",
     status_code=status.HTTP_200_OK,
     summary="Receive real-time encoded payload updates from Telegram Bot API",
 )

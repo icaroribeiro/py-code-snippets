@@ -1,7 +1,7 @@
 from enum import Enum
 from functools import cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Final
 
 from pydantic import Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -116,6 +116,10 @@ class TelegramSettings(BaseSettings):
     base_url: str = Field(default="your_base_url_here")
     bot_token: str = Field(default="your_bot_token_here")
     api_key: str = Field(default="your_api_key_here")
+    supported_languages: Final[list[tuple[str, str | None]]] = [
+        ("en-US", None),
+        ("pt-BR", "pt"),
+    ]
 
     @field_validator("mode", mode="before")
     @classmethod

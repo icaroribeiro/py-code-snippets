@@ -1,7 +1,0 @@
-{
-  "cmd_start": "Start / Restart the bot",
-  "cmd_menu": "View main menu",
-  "bot_pre_start_description": "Hello! This is the FooBar virtual assistant.\n\nTo start your service, click below on the 'Start Bot' button.",
-  "welcome_short_intro": "Welcome to the assisted system!",
-  "welcome_message": "Use the 'Menu' button located in the bottom left corner or type commands directly into the chat."
-}

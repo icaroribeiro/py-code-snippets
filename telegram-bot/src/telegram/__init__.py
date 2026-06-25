@@ -1,4 +1,4 @@
-from telegram.bot_menu import TelegramBotMenu
 from telegram.dispatcher import TelegramDispatcher
+from telegram.menu import TelegramMenu
 
-__all__ = ["TelegramBotMenu", "TelegramDispatcher"]
+__all__ = ["TelegramDispatcher", "TelegramMenu"]

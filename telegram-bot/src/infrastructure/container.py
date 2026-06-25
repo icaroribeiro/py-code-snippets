@@ -16,10 +16,10 @@ from infrastructure.config import (
     get_task_service_api_settings,
     get_telegram_settings,
 )
-from infrastructure.cross_cutting import i18nService
 from infrastructure.http_client import HTTPClient
+from infrastructure.i18n import i18nService
 from infrastructure.mongodb import MigrationManager, MongoDBDatabase
-from telegram import TelegramBotMenu, TelegramDispatcher
+from telegram import TelegramDispatcher, TelegramMenu
 
 
 async def init_mongodb_database_resource(
@@ -38,11 +38,9 @@ async def init_mongodb_database_resource(
 
 
 def init_telegram_dispatcher(
-    bot_menu: TelegramBotMenu, i18n_service: i18nService
+    menu: TelegramMenu, i18n_service: i18nService
 ) -> Dispatcher:
-    dispatcher_wrapper = TelegramDispatcher(
-        bot_menu=bot_menu, i18n_service=i18n_service
-    )
+    dispatcher_wrapper = TelegramDispatcher(menu=menu, i18n_service=i18n_service)
     return dispatcher_wrapper.init()
 
 
@@ -62,51 +60,53 @@ class Container(containers.DeclarativeContainer):
 
     i18n_service = providers.Singleton(i18nService, default_lang="en-US")
 
-    telegram_bot_menu = providers.Singleton(TelegramBotMenu, i18n_service)
+    telegram_bot_menu = providers.Singleton(
+        TelegramMenu, telegram_settings, i18n_service
+    )
 
     mongo_client = providers.Singleton(AsyncMongoClient, mongodb_settings.provided.uri)
     migration_manager = providers.Factory(
         MigrationManager,
-        database_uri=mongodb_settings.provided.uri,
-        database_name=mongodb_settings.provided.database,
-        migrations_path=mongodb_settings.provided.migrations_path,
+        mongodb_settings.provided.uri,
+        mongodb_settings.provided.database,
+        mongodb_settings.provided.migrations_path,
     )
 
     mongodb_database = providers.Resource(
         init_mongodb_database_resource,
-        mongodb_settings=mongodb_settings,
-        mongo_client=mongo_client,
-        migration_manager=migration_manager,
+        mongodb_settings,
+        mongo_client,
+        migration_manager,
     )
 
     health_checker_adapter = providers.Factory(
         HealthCheck,
-        mongodb_database=mongodb_database,
+        mongodb_database,
     )
 
-    http_client = providers.Factory(HTTPClient, settings=http_client_settings)
+    http_client = providers.Factory(HTTPClient, http_client_settings)
 
     task_service_api_adapter = providers.Singleton(
         TaskServiceApi,
-        http_client=http_client,
-        settings=task_service_api_settings,
+        http_client,
+        task_service_api_settings,
     )
 
     health_check_use_case = providers.Factory(
         HealthCheckUseCase,
-        health_checker=health_checker_adapter,
+        health_checker_adapter,
     )
 
     telegram_dispatcher = providers.Singleton(
         init_telegram_dispatcher,
-        bot_menu=telegram_bot_menu,
-        i18n_service=i18n_service,
+        telegram_bot_menu,
+        i18n_service,
     )
 
     telegram_webhook_use_case = providers.Factory(
-        TelegramWebhookUseCase, bot=bot, dispatcher=telegram_dispatcher
+        TelegramWebhookUseCase, bot, telegram_dispatcher
     )
 
     telegram_task_callback_use_case = providers.Singleton(
-        TelegramTaskCallbackUseCase, bot=bot, i18n_service=i18n_service
+        TelegramTaskCallbackUseCase, bot, i18n_service
     )

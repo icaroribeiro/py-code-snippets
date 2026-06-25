@@ -1,31 +1,31 @@
-from aiogram import Bot, Router
+from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram_dialog import DialogManager, StartMode
 
 from infrastructure.i18n import i18nService
-from telegram.features.welcome.states import WelcomeStates
+from telegram.features.welcome import WelcomeStates
 
 welcome_router = Router()
 
 
-@welcome_router.startup()
-async def register_welcome_pre_start_description(
-    bot: Bot, i18n_service: i18nService
-) -> None:
-    """Registers localized bot descriptions into Telegram during system startup."""
-    await bot.set_my_description(
-        description=i18n_service.translate(
-            key="bot_pre_start_description", lang="en-US"
-        )
-    )
+# @welcome_router.startup()
+# async def register_welcome_pre_start_description(
+#     bot: Bot, i18n_service: i18nService
+# ) -> None:
+#     """Registers localized bot descriptions into Telegram during system startup."""
+#     await bot.set_my_description(
+#         description=i18n_service.translate(
+#             key="bot_pre_start_description", lang="en-US"
+#         )
+#     )
 
-    await bot.set_my_description(
-        description=i18n_service.translate(
-            key="bot_pre_start_description", lang="pt-BR"
-        ),
-        language_code="pt",
-    )
+#     await bot.set_my_description(
+#         description=i18n_service.translate(
+#             key="bot_pre_start_description", lang="pt-BR"
+#         ),
+#         language_code="pt",
+#     )
 
 
 @welcome_router.message(Command("start"))

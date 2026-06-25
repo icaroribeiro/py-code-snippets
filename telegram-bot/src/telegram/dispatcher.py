@@ -16,16 +16,12 @@ class TelegramDispatcher:
         self._i18n_service = i18n_service
 
     def init(self) -> Dispatcher:
-        dp = Dispatcher()
+        dispatcher = Dispatcher()
+        dispatcher["i18n_service"] = self._i18n_service
+        dispatcher.startup.register(self._menu.set_commands)
+        dispatcher.message.middleware(LanguageMiddleware())
+        dispatcher.include_router(features_router)
 
-        dp["i18n_service"] = self._i18n_service
+        setup_dialogs(dispatcher)
 
-        dp.startup.register(self._menu.set_commands)
-
-        dp.message.middleware(LanguageMiddleware())
-
-        dp.include_router(features_router)
-
-        setup_dialogs(dp)
-
-        return dp
+        return dispatcher

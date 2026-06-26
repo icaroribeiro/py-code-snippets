@@ -79,8 +79,8 @@ class HTTPServer:
                 )
                 await bot.set_webhook(
                     url=webhook_url,
-                    secret_token=telegram_settings.api_key
-                    if telegram_settings.api_key
+                    secret_token=telegram_settings.webhook_secret
+                    if telegram_settings.webhook_secret
                     else None,
                 )
             else:

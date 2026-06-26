@@ -5,14 +5,14 @@ from pydantic import BaseModel, Field
 from core.domain import TaskResult, TaskStatus, TaskType
 
 
-class TelegramWebhookMapper:
+class BotWebhookMapper:
     @staticmethod
     def request_to_domain_dict(raw_json: dict[str, Any]) -> dict[str, Any]:
         """Maps HTTP incoming request body payload to core system-executable dictionary format."""
         return raw_json
 
 
-class TelegramTaskCallbackRequestSchema(BaseModel):
+class BotTaskCallbackRequestSchema(BaseModel):
     task_id: str = Field(...)
     task_type: str = Field(...)
     chat_id: int = Field(...)
@@ -21,10 +21,10 @@ class TelegramTaskCallbackRequestSchema(BaseModel):
     lang: str = Field(...)
 
 
-class TelegramTaskCallbackMapper:
+class BotTaskCallbackMapper:
     @staticmethod
     def request_to_domain(
-        request: TelegramTaskCallbackRequestSchema,
+        request: BotTaskCallbackRequestSchema,
     ) -> TaskResult:
         try:
             t_type = TaskType(request.task_type)

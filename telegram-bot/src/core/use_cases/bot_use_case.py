@@ -4,16 +4,17 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import Update
 
 from core.domain import TaskResult, TaskStatus, TaskType
-from core.ports.inbound.telegram_port import (
-    TelegramTaskCallbackInputPort,
-    TelegramWebhookInputPort,
+from core.ports.inbound.bot_port import (
+    BotTaskCallbackInputPort,
+    BotWebhookInputPort,
 )
-from infrastructure.cross_cutting import get_logger, i18nService
+from infrastructure.cross_cutting import get_logger
+from infrastructure.i18n import i18nService
 
 logger = get_logger(__name__)
 
 
-class TelegramWebhookUseCase(TelegramWebhookInputPort):
+class BotWebhookUseCase(BotWebhookInputPort):
     def __init__(self, bot: Bot, dispatcher: Dispatcher) -> None:
         self._bot = bot
         self._dispatcher = dispatcher
@@ -24,7 +25,7 @@ class TelegramWebhookUseCase(TelegramWebhookInputPort):
         await self._dispatcher.feed_update(bot=self._bot, update=telegram_update)
 
 
-class TelegramTaskCallbackUseCase(TelegramTaskCallbackInputPort):
+class BotTaskCallbackUseCase(BotTaskCallbackInputPort):
     def __init__(self, bot: Bot, i18n_service: i18nService) -> None:
         self._bot = bot
         self._i18n_service = i18n_service

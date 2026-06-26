@@ -1,4 +1,3 @@
-import inspect
 from functools import lru_cache
 from pathlib import Path
 
@@ -14,6 +13,8 @@ class i18nService:
 
     def __init__(self, default_lang: str = "en-US") -> None:
         self._default_lang = default_lang
+        # Statically defines the path to the locales folder relative to this file
+        self._locales_dir = Path(__file__).resolve().parent / "locales"
 
     @lru_cache(maxsize=128)
     def _load_json_file(self, file_path: Path) -> dict:
@@ -32,25 +33,11 @@ class i18nService:
             logger.error(f"Failed to read localization file at {file_path}: {error}")
             return {}
 
-    def _get_caller_i18n_path(self) -> Path:
-        """Inspects the stack to find the 'i18n' directory sibling to the caller file."""
-        try:
-            # frame 0 is this method, frame 1 is 'translate', frame 2 is the actual caller
-            frame = inspect.stack()[2]
-            caller_file_path = Path(frame.filename)
-            # Returns the path of the i18n folder sibling to the file that called the service
-            return caller_file_path.parent / "i18n"
-        except Exception as error:
-            logger.error(f"Failed to inspect stack for i18n auto-detection: {error}")
-            # Safe fallback if stack inspection fails in a specific runtime environment
-            return Path.cwd()
-
     def translate(self, key: str, lang: str | None = None, **kwargs) -> str:
         locale = lang or self._default_lang
 
-        # 1. Automatically finds the i18n directory of the calling feature
-        i18n_dir = self._get_caller_i18n_path()
-        target_file = i18n_dir / f"{locale}.json"
+        # 1. Targets the specific locale file within the centralized infrastructure directory
+        target_file = self._locales_dir / f"{locale}.json"
 
         # 2. Attempts to load the translation for the requested language
         translations = self._load_json_file(target_file)
@@ -58,14 +45,14 @@ class i18nService:
 
         # 3. Fallback to the default language if the key is missing in the current language
         if text is None and locale != self._default_lang:
-            fallback_file = i18n_dir / f"{self._default_lang}.json"
+            fallback_file = self._locales_dir / f"{self._default_lang}.json"
             translations = self._load_json_file(fallback_file)
             text = translations.get(key)
 
         # 4. Final safety fallback if the key is missing entirely from the context
         if text is None:
             logger.warning(
-                f"Translation key '{key}' missing from localized context at {i18n_dir}."
+                f"Translation key '{key}' missing from localized context at {self._locales_dir}."
             )
             return f"[{key}]"
 

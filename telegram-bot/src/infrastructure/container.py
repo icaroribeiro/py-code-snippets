@@ -5,9 +5,9 @@ from pymongo import AsyncMongoClient
 from adapters.outbound.external_apis import TaskServiceApi
 from adapters.outbound.system import HealthCheck
 from core.use_cases import (
+    BotTaskCallbackUseCase,
+    BotWebhookUseCase,
     HealthCheckUseCase,
-    TelegramTaskCallbackUseCase,
-    TelegramWebhookUseCase,
 )
 from infrastructure.config import (
     MongoDBSettings,
@@ -103,10 +103,10 @@ class Container(containers.DeclarativeContainer):
         i18n_service,
     )
 
-    telegram_webhook_use_case = providers.Factory(
-        TelegramWebhookUseCase, bot, telegram_dispatcher
+    bot_webhook_use_case = providers.Factory(
+        BotWebhookUseCase, bot, telegram_dispatcher
     )
 
-    telegram_task_callback_use_case = providers.Singleton(
-        TelegramTaskCallbackUseCase, bot, i18n_service
+    bot_task_callback_use_case = providers.Singleton(
+        BotTaskCallbackUseCase, bot, i18n_service
     )

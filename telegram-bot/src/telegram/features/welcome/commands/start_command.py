@@ -1,8 +1,7 @@
 from aiogram.types import BotCommand
 
 from infrastructure.i18n import i18nService
-
-from ..constants.i18n import CMD_START_KEY
+from telegram.features.welcome.constants.i18n import CMD_START_KEY
 
 
 class StartCommand:

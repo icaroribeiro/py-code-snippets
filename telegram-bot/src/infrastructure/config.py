@@ -114,8 +114,10 @@ class TelegramSettings(BaseSettings):
 
     mode: TelegramMode = Field(default=TelegramMode.POLLING)
     base_url: str = Field(default="your_base_url_here")
+    product_name: str = Field(default="your_product_name_here")
+    bot_username: str = Field(default="your_bot_username_here")
     bot_token: str = Field(default="your_bot_token_here")
-    api_key: str = Field(default="your_api_key_here")
+    webhook_secret: str = Field(default="your_webhook_secret_here")
     supported_languages: Final[list[tuple[str, str | None]]] = [
         ("en-US", None),
         ("pt-BR", "pt"),
@@ -135,6 +137,11 @@ class TelegramSettings(BaseSettings):
             )
             return normalized
         return v
+
+    @computed_field
+    @property
+    def bot_slug(self) -> str:
+        return f"{self.bot_username}-{self.product_name}"
 
 
 @cache

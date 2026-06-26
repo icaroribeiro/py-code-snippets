@@ -1,11 +1,11 @@
-from core.ports.inbound.health_port import HealthCheckInputPort
-from core.ports.inbound.telegram_port import (
-    TelegramTaskCallbackInputPort,
-    TelegramWebhookInputPort,
+from core.ports.inbound.bot_port import (
+    BotTaskCallbackInputPort,
+    BotWebhookInputPort,
 )
+from core.ports.inbound.health_port import HealthCheckInputPort
 
 __all__ = [
     "HealthCheckInputPort",
-    "TelegramWebhookInputPort",
-    "TelegramTaskCallbackInputPort",
+    "BotWebhookInputPort",
+    "BotTaskCallbackInputPort",
 ]
